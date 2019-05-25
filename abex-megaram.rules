@@ -1,0 +1,132 @@
+
+(rules PCB abex-megaram
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 451)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.9)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.5)
+    )
+  )
+  (rule
+    (width 250.0)
+    (clear 200.2)
+    (clear 125.0 (type smd_to_turn_gap))
+    (clear 50.0 (type smd_smd))
+  )
+  (padstack "Via[0-1]_400:300_um"
+    (shape
+      (circle F.Cu 400.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 400.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_400:300_um" "Via[0-1]_400:300_um" default
+  )
+  (via 
+    "Via[0-1]_400:300_um-kicad_default" "Via[0-1]_400:300_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_400:300_um-+5VDC" "Via[0-1]_400:300_um" +5VDC
+  )
+  (via 
+    "Via[0-1]_400:300_um-GND" "Via[0-1]_400:300_um" GND
+  )
+  (via 
+    "Via[0-1]_400:300_um-VCC5V" "Via[0-1]_400:300_um" VCC5V
+  )
+  (via_rule
+    default "Via[0-1]_400:300_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_400:300_um-kicad_default"
+  )
+  (via_rule
+    +5VDC "Via[0-1]_400:300_um-+5VDC"
+  )
+  (via_rule
+    GND "Via[0-1]_400:300_um-GND"
+  )
+  (via_rule
+    VCC5V "Via[0-1]_400:300_um-VCC5V"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    GND "Net-(D5-Pad2)" TP1 ~mEXSEL ~mD1XX ~mHALT ~mMPD ~mIRQ
+    ~mRST ~mREF ~mCCTL mA0 mA1 mA2 mA3 mA4
+    mA5 mA6 mA7 mA8 mA9 mA10 mA11 mA12
+    mA13 mA14 mA15 mR/~W ~mS4 mRD4 ~mS5 mRD5
+    mD0 mD1 mD2 mD3 mD4 mD5 mD6 mD7
+    mW/~R "UART_RX" "UART_TX" mB6 mB7 "LEDGRN_MEM" mB3 mB1
+    mB2 mB4 mB0 mB5 ~mB5 "Net-(BOOT0_MEM1-Pad1)" "Net-(BOOT1_MEM1-Pad1)" "Net-(C19-Pad1)"
+    "Net-(C20-Pad1)" "VCAP_2_MEM" "VCAP_1_MEM" "Net-(R18-Pad1)" "Net-(R19-Pad1)" "Net-(R26-Pad2)" "Net-(R30-Pad1)" PB6
+    PB9 "VCC_3V3" SWDRST mPHI2 mAUDIO SWDIO SWDCLK
+    (clearance_class "kicad_default")
+    (via_rule kicad_default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class +5VDC
+    (clearance_class +5VDC)
+    (via_rule +5VDC)
+    (rule
+      (width 350.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class GND
+    (clearance_class GND)
+    (via_rule GND)
+    (rule
+      (width 500.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class VCC5V
+    (clearance_class VCC5V)
+    (via_rule VCC5V)
+    (rule
+      (width 350.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)

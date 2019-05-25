@@ -1,0 +1,25 @@
+Drill report for /home/debian/Progetti/ATARI/abex-megaram/abex-megaram.kicad_pcb
+Created on Sat 25 May 2019 15:12:55 CEST
+
+Copper Layer Stackup:
+    =============================================================
+    L1 :  F.Cu                      front
+    L2 :  B.Cu                      back
+
+
+Drill file 'abex-megaram.drl' contains
+    plated through holes:
+    =============================================================
+    T1  0,30mm  0,012"  (227 holes)
+    T2  0,80mm  0,031"  (2 holes)
+    T3  1,02mm  0,040"  (13 holes)
+    T4  3,00mm  0,118"  (4 holes)
+
+    Total plated holes count 246
+
+
+Not plated through holes are merged with plated holes
+    unplated through holes:
+    =============================================================
+
+    Total unplated holes count 0
