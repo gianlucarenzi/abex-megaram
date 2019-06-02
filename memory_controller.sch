@@ -444,7 +444,6 @@ SWDIO_MEM
 NoConn ~ 6200 1950
 NoConn ~ 6200 1850
 NoConn ~ 6200 1750
-NoConn ~ 700  4150
 $Comp
 L R_Small R19
 U 1 1 5C43FC39
@@ -495,9 +494,6 @@ NoConn ~ 6200 2750
 NoConn ~ 4400 3150
 NoConn ~ 6200 1650
 NoConn ~ 6200 1550
-NoConn ~ 6200 1450
-NoConn ~ 6200 1350
-NoConn ~ 6200 1250
 NoConn ~ 6200 4950
 NoConn ~ 6200 5250
 NoConn ~ 6200 5350
@@ -828,7 +824,7 @@ Wire Wire Line
 Wire Wire Line
 	6950 2250 6950 2100
 Wire Wire Line
-	6550 2150 6200 2150
+	6200 2150 6550 2150
 Wire Wire Line
 	6450 2000 6450 2150
 Connection ~ 6450 2150
@@ -1087,4 +1083,209 @@ Text GLabel 6200 3350 2    39   BiDi ~ 0
 mRD4
 NoConn ~ 6200 4350
 NoConn ~ 6200 4250
+$Comp
+L SW_DIP_x03 SW1
+U 1 1 5CF3CB14
+P 2250 4600
+F 0 "SW1" H 2250 4950 50  0000 C CNN
+F 1 "SW_DIP_x03" H 2250 4450 50  0000 C CNN
+F 2 "RetroBitLab:SW_DIP_SPSTx03_Slide_9.78x9.8mm_W8.61mm_P2.54mm" H 2250 4600 50  0001 C CNN
+F 3 "" H 2250 4600 50  0001 C CNN
+	1    2250 4600
+	1    0    0    -1  
+$EndComp
+$Comp
+L R_Small R5
+U 1 1 5CF3CC0D
+P 2750 4050
+F 0 "R5" H 2780 4070 50  0000 L CNN
+F 1 "4.7K" H 2780 4010 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 2750 4050 50  0001 C CNN
+F 3 "" H 2750 4050 50  0001 C CNN
+	1    2750 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2750 4150 2750 4400
+Text GLabel 2750 3900 1    39   Input ~ 0
+VCC_3V3
+Wire Wire Line
+	2750 3900 2750 3950
+$Comp
+L R_Small R7
+U 1 1 5CF3CEBD
+P 3000 4050
+F 0 "R7" H 3030 4070 50  0000 L CNN
+F 1 "4.7K" H 3030 4010 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 3000 4050 50  0001 C CNN
+F 3 "" H 3000 4050 50  0001 C CNN
+	1    3000 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3000 4150 3000 4500
+Text GLabel 3000 3900 1    39   Input ~ 0
+VCC_3V3
+Wire Wire Line
+	3000 3900 3000 3950
+$Comp
+L R_Small R8
+U 1 1 5CF3CF1F
+P 3250 4050
+F 0 "R8" H 3280 4070 50  0000 L CNN
+F 1 "4.7K" H 3280 4010 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 3250 4050 50  0001 C CNN
+F 3 "" H 3250 4050 50  0001 C CNN
+	1    3250 4050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3250 4150 3250 4600
+Text GLabel 3250 3900 1    39   Input ~ 0
+VCC_3V3
+Wire Wire Line
+	3250 3900 3250 3950
+Wire Wire Line
+	2550 4400 3350 4400
+Wire Wire Line
+	2550 4500 3350 4500
+Wire Wire Line
+	2550 4600 3350 4600
+Connection ~ 3250 4600
+Connection ~ 3000 4500
+Connection ~ 2750 4400
+$Comp
+L R_Small R4
+U 1 1 5CF3D4D2
+P 1800 4250
+F 0 "R4" H 1650 4350 50  0000 L CNN
+F 1 "470" H 1830 4210 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 1800 4250 50  0001 C CNN
+F 3 "" H 1800 4250 50  0001 C CNN
+	1    1800 4250
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR032
+U 1 1 5CF3D4D8
+P 1800 4150
+F 0 "#PWR032" H 1800 3900 50  0001 C CNN
+F 1 "GND" H 1800 4000 50  0000 C CNN
+F 2 "" H 1800 4150 50  0001 C CNN
+F 3 "" H 1800 4150 50  0001 C CNN
+	1    1800 4150
+	-1   0    0    1   
+$EndComp
+$Comp
+L R_Small R3
+U 1 1 5CF3D842
+P 1550 4250
+F 0 "R3" H 1400 4350 50  0000 L CNN
+F 1 "470" H 1580 4210 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 1550 4250 50  0001 C CNN
+F 3 "" H 1550 4250 50  0001 C CNN
+	1    1550 4250
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR033
+U 1 1 5CF3D8CC
+P 1550 4150
+F 0 "#PWR033" H 1550 3900 50  0001 C CNN
+F 1 "GND" H 1550 4000 50  0000 C CNN
+F 2 "" H 1550 4150 50  0001 C CNN
+F 3 "" H 1550 4150 50  0001 C CNN
+	1    1550 4150
+	-1   0    0    1   
+$EndComp
+$Comp
+L R_Small R2
+U 1 1 5CF3D949
+P 1300 4250
+F 0 "R2" H 1150 4350 50  0000 L CNN
+F 1 "470" H 1330 4210 50  0000 L CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" H 1300 4250 50  0001 C CNN
+F 3 "" H 1300 4250 50  0001 C CNN
+	1    1300 4250
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR034
+U 1 1 5CF3D9DA
+P 1300 4150
+F 0 "#PWR034" H 1300 3900 50  0001 C CNN
+F 1 "GND" H 1300 4000 50  0000 C CNN
+F 2 "" H 1300 4150 50  0001 C CNN
+F 3 "" H 1300 4150 50  0001 C CNN
+	1    1300 4150
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1800 4350 1800 4400
+Wire Wire Line
+	1800 4400 1950 4400
+Wire Wire Line
+	1950 4500 1550 4500
+Wire Wire Line
+	1550 4500 1550 4350
+Wire Wire Line
+	1950 4600 1300 4600
+Wire Wire Line
+	1300 4600 1300 4350
+Text GLabel 3350 4400 2    39   BiDi ~ 0
+mCONF0
+Text GLabel 3350 4500 2    39   BiDi ~ 0
+mCONF1
+Text GLabel 3350 4600 2    39   BiDi ~ 0
+mCONF2
+Text GLabel 6900 1250 2    39   BiDi ~ 0
+mCONF0
+Text GLabel 6900 1350 2    39   BiDi ~ 0
+mCONF1
+Text GLabel 6900 1450 2    39   BiDi ~ 0
+mCONF2
+Wire Wire Line
+	6200 1250 6900 1250
+Wire Wire Line
+	6900 1350 6200 1350
+Wire Wire Line
+	6200 1450 6900 1450
+Text Notes 950  5350 0    59   ~ 12
+mCONF2   mCONF1   mCONF0
+Text Notes 950  5600 0    59   ~ 12
+      0         0         0
+Text Notes 950  5850 0    59   ~ 12
+      0         0         1
+Text Notes 950  6100 0    59   ~ 12
+      0         1         0
+Text Notes 950  6350 0    59   ~ 12
+      0         1         1
+Text Notes 950  6600 0    59   ~ 12
+      1         0         0
+Text Notes 2600 5600 0    59   ~ 12
+130XE
+Text Notes 2600 5850 0    59   ~ 12
+192K CompyShop
+Text Notes 2600 6100 0    59   ~ 12
+320K RAMBO
+Text Notes 2600 6350 0    59   ~ 12
+576K MOD
+Text Notes 2600 6600 0    59   ~ 12
+1088K MOD
+Wire Notes Line
+	700  5200 3650 5200
+Wire Notes Line
+	3650 5200 3650 6800
+Wire Notes Line
+	3650 6800 700  6800
+Wire Notes Line
+	700  6800 700  5200
+Wire Notes Line
+	700  5400 3650 5400
+Wire Notes Line
+	2450 5200 2450 6800
+Text Notes 2700 5350 0    59   ~ 12
+EXPANSION MODE
+Text Notes 750  7400 0    79   ~ 16
+130XE the internal extra 64K RAM are disabled by default. Only External RAM is available.
 $EndSCHEMATC
