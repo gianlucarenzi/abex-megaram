@@ -5,10 +5,15 @@
 ######################################
 # debug build?
 DEBUG = 0
-# optimization level
-#OPTLVL = -O2
-OPTLVL = -O3
-OPT = $(OPTLVL) -fomit-frame-pointer -funroll-loops
+
+ifeq ($(DEBUG), 1)
+	OPT =
+else
+	# optimization level
+	OPTLVL = -O2
+	#OPTLVL = -O3
+	OPT = $(OPTLVL) -fomit-frame-pointer -funroll-loops
+endif
 
 
 #######################################
