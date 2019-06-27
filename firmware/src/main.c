@@ -20,8 +20,6 @@
 
 #include "defines.h"
 #include "stm32f4xx.h"
-#include "tm_stm32f4_fatfs.h"
-#include "tm_stm32f4_delay.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -87,9 +85,36 @@ typedef enum {
 static uint8_t PORTB = 0xFF;
 static uint8_t PBCTL = 0x00;
 
-GPIO_InitTypeDef  GPIO_InitStructure;
+/*
+ * ******************** DEBUG PORT UART *****************************
+ */
+#define DEBUG_TX           GPIO_Pin_9
+#define DEBUG_RX           GPIO_Pin_10
+#define DEBUG_PINSRC_TX    GPIO_PinSource9
+#define DEBUG_PINSRC_RX    GPIO_PinSource10
+#define DEBUG_PORT         GPIOA
+enum {
+	DBG_ERROR = 0,
+	DBG_INFO,
+	DBG_VERBOSE,
+	DBG_NOISY,
+};
+static int debuglevel = DBG_INFO;
+#define print(str)	USART_PutString(str)
+/* ANSI Eye-Candy ;-) */
+#define ANSI_RED    "\x1b[31m"
+#define ANSI_GREEN  "\x1b[32m"
+#define ANSI_YELLOW "\x1b[1;33m"
+#define ANSI_BLUE   "\x1b[1;34m"
+#define ANSI_RESET  "\x1b[0m"
+#define DBG_E(str)	print(ANSI_RED); print(str); print(ANSI_RESET);
+#define DBG_I(str)	if (debuglevel >= DBG_INFO) { print(ANSI_GREEN); print(str); print(ANSI_RESET); }
+#define DBG_V(str)	if (debuglevel >= DBG_VERBOSE) { print(ANSI_BLUE); print(str); printf(ANSI_RESET); }
+#define DBG_N(str)	if (debuglevel >= DBG_NOISY) { print(ANSI_YELLOW); print(str); printf(ANSI_RESET); }
 
-void config_gpio()
+
+static GPIO_InitTypeDef  GPIO_InitStructure;
+static void config_gpio()
 {
 	/* Green LED -> PB0, Red TP1 -> PB1, RD5 -> PB2, RD4 -> PB4
 	 * PB5 -> NC, PB6 -> UNUSED (PU), PB7 -> D1xx, PB8 -> EXSEL,
@@ -173,6 +198,100 @@ void config_gpio()
 
 }
 
+/* Useful for redirecting stdout output to serial line */
+static void config_uart(uint32_t baudrate)
+{
+	// Enable clock for GPIOA
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	// Enable clock for USART1
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+
+	// Connect PA9 to USART1_Tx
+	GPIO_PinAFConfig(DEBUG_PORT, DEBUG_PINSRC_TX, GPIO_AF_USART1);
+	// Connect PA10 to USART1_Rx
+	GPIO_PinAFConfig(DEBUG_PORT, DEBUG_PINSRC_RX, GPIO_AF_USART1);
+
+	// Initialization of DEBUG UART GPIO
+	GPIO_InitStructure.GPIO_Pin = DEBUG_TX | DEBUG_RX;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_Init(DEBUG_PORT, &GPIO_InitStructure);
+
+	// Initialization of USART1
+	USART_InitTypeDef USART_InitStruct;
+	USART_InitStruct.USART_BaudRate = baudrate;
+	USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_InitStruct.USART_Parity = USART_Parity_No;
+	USART_InitStruct.USART_StopBits = USART_StopBits_1;
+	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
+	USART_Init(USART1, &USART_InitStruct);
+
+	// Enable USART1
+	USART_Cmd(USART1, ENABLE);
+}
+
+static void USART_PutChar(char c)
+{
+	// Wait until transmit data register is empty
+	while (!USART_GetFlagStatus(USART1, USART_FLAG_TXE))
+		;
+	// Send a char using USART1
+	USART_SendData(USART1, c);
+}
+
+static void USART_PutString(char *s)
+{
+	// Send a string
+	while (*s)
+	{
+		USART_PutChar(*s++);
+	}
+}
+
+static void banner(t_expansion type)
+{
+	DBG_I("ABEX-MEGARAM BOARD ");
+	switch(type)
+	{
+		case EXPANSION_TYPE_130XE:
+			print(ANSI_BLUE);
+			print("130XE 128K EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_192K_COMPYSHOP:
+			print(ANSI_BLUE);
+			print("192K COMPYSHOP EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_320K_COMPYSHOP:
+			print(ANSI_BLUE);
+			print("320K COMPYSHOP EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_320K_RAMBO:
+			print(ANSI_BLUE);
+			print("320K RAMBO EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_576K_MOD:
+			print(ANSI_BLUE);
+			print("576K MOD EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_1088K_MOD:
+			print(ANSI_BLUE);
+			print("1088K MOD EXPANSION\r\n");
+			print(ANSI_RESET);
+			break;
+		default:
+			DBG_E("UNKNOWN EXPANSION TYPE!\r\n");
+			break;
+	}
+	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
+}
 
 /*
 	Theory of Operation
@@ -185,14 +304,17 @@ void config_gpio()
 	It will be re-activated after sent into the bus...
 */
 
-int main(void) {
-
+int main(void)
+{
 	t_expansion expansion_type = EXPANSION_TYPE_130XE; /* Default */
 	uint16_t addr;
 	uint8_t data;
 	uint8_t c;
 
 	config_gpio();
+	config_uart(115200);
+
+	banner( expansion_type );
 
 	GREEN_LED_OFF
 
@@ -202,20 +324,23 @@ int main(void) {
 	__disable_irq();
 
 	while (1) {
-		/* Check for accessing PORTB, PBCTL and Address Space 0x4000-0x7FFF */
+		/* 
+		 * Emulating of PORTB/PBCTL and RAM selection bits when
+		 * accessing 0x4000-0x7FFF area.
+		 */
 
 		// Wait for a valid sequence in the bus
-		// PHI2 HIGH
 
 		// wait for phi2 high
 		while (!((c = CONTROL_IN) & PHI2)) ;
 
-		// Check for address valid on the bus!
+		// Check for address only if there is a valid state of the PHI2
+		// on the bus!
 		addr = ADDR_IN;
 
 		switch (addr)
 		{
-			case 0xD303: /* PBCTL */
+			case 0xD303: /* PBCTL Emulation */
 				// ATARI CPU Needs to WRITE Data?
 				if (!(c & RW))
 				{
@@ -224,12 +349,14 @@ int main(void) {
 					// read the data bus on falling edge of phi2
 					while (CONTROL_IN & PHI2)
 						data = DATA_IN;
+					// Only the upper 8 bit of the port for DATA are used
 					PBCTL = (data & 0xff00) >> 8;
 				}
 				else
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
+					// Only the upper 8 bit of the port for DATA are used
 					DATA_OUT = PBCTL << 8;
 
 					// wait for phi2 low
@@ -238,7 +365,7 @@ int main(void) {
 				}
 				break;
 
-			case 0xD301: /* PORTB */
+			case 0xD301: /* PORTB Emulation */
 				// ATARI CPU Needs to WRITE Data?
 				if (!(c & RW))
 				{
@@ -247,12 +374,14 @@ int main(void) {
 					// read the data bus on falling edge of phi2
 					while (CONTROL_IN & PHI2)
 						data = DATA_IN;
+					// Only the upper 8 bit of the port for DATA are used
 					PORTB = (data & 0xff00) >> 8;
 				}
 				else
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
+					// Only the upper 8 bit of the port for DATA are used
 					DATA_OUT = PORTB << 8;
 
 					// wait for phi2 low
@@ -263,11 +392,11 @@ int main(void) {
 
 			default:
 				/* WINDOW BANKED MEMORY ACCESS 16K */
-				if (addr <= 0x7fff && addr >= 0x4000)
+				if (addr >= 0x4000 && addr < 0x8000)
 				{
 					addr -= 0x4000; /* Relative address here */
 					/*
-					 * D2 Data direction register enable
+						D2 Data direction register enable
 							0 PORTB [D301] accesses data direction register
 							1 PORTB [D301] accesses input and output registers
 					*/
@@ -276,9 +405,11 @@ int main(void) {
 					{
 						uint8_t bank;
 
+						// When accessing the external RAM the internal
+						// RAM must be disabled!
 						INTERNAL_RAM_DISABLE;
 
-						/* Good! We can access our AM EXPANSION! */
+						/* Good! We can access our AtariMegaRAM EXPANSION! */
 						GREEN_LED_ON;
 
 						// ATARI CPU Needs to WRITE Data?
@@ -290,6 +421,7 @@ int main(void) {
 							while (CONTROL_IN & PHI2)
 								data = DATA_IN;
 
+							// Only the upper 8 bit of the port for DATA are used
 							data = (data & 0xff00) >> 8;
 
 							// Now we can write the data at the desired address
@@ -339,6 +471,7 @@ int main(void) {
 #ifdef USE_INTERNAL_CCRAM_EXPANSION
 									// CPU Needs to READ Data from internal memory
 									SET_DATA_MODE_OUT
+									// Only the upper 8 bit of the port for DATA are used
 									DATA_OUT = (expansion_ram[ addr + (bank * 0x4000) ]) << 8;
 #else
 									CHIPRAM_BANKSELECT(bank);
