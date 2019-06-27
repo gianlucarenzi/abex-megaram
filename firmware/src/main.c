@@ -40,12 +40,14 @@ unsigned char expansion_ram[64*1024] __attribute__((section(".ccmram")));
 #undef  USE_INTERNAL_CCRAM_EXPANSION
 
 typedef enum {
-	EXPANSION_TYPE_130XE = 0,
-	EXPANSION_TYPE_192K_COMPYSHOP,
-	EXPANSION_TYPE_320K_RAMBO,
-	EXPANSION_TYPE_320K_COMPYSHOP,
-	EXPANSION_TYPE_576K_MOD,
-	EXPANSION_TYPE_1088K_MOD,
+	EXPANSION_TYPE_130XE = 0,       /* 0 0 0 */
+	EXPANSION_TYPE_192K_COMPYSHOP,  /* 0 0 1 */
+	EXPANSION_TYPE_320K_RAMBO,      /* 0 1 0 */
+	EXPANSION_TYPE_320K_COMPYSHOP,  /* 0 1 1 */
+	EXPANSION_TYPE_576K_MOD,        /* 1 0 0 */
+	EXPANSION_TYPE_1088K_MOD,       /* 1 0 1 */
+	                                /* 1 1 0 */
+	                                /* 1 1 1 */
 	EXPANSION_TYPE_NONE, // LAST
 } t_expansion;
 
@@ -70,16 +72,21 @@ typedef enum {
 #define CCTL	0x0010
 #define RW		0x0020
 
-#define SET_DATA_MODE_IN GPIOE->MODER = 0x00000000;
+#define SET_DATA_MODE_IN  GPIOE->MODER = 0x00000000;
 #define SET_DATA_MODE_OUT GPIOE->MODER = 0x55550000;
 
 #define GREEN_LED_OFF GPIOB->BSRRH = GPIO_Pin_0;
-#define GREEN_LED_ON GPIOB->BSRRL = GPIO_Pin_0;
+#define GREEN_LED_ON  GPIOB->BSRRL = GPIO_Pin_0;
 
 #define INTERNAL_RAM_DISABLE GPIOB->BSRRL = GPIO_Pin_8;
 #define INTERNAL_RAM_ENABLE  GPIOB->BSRRH = GPIO_Pin_8;
 
 #define CHIPRAM_BANKSELECT(a)	(GPIO_Write(GPIOC, a << 8)); /* HIGH BYTE PC8-PC15 */
+
+#define ATARI_RESET_ASSERT    GPIOA->BSRRL = GPIO_Pin_3; /* RST -> GPIO(A.3) LOW */
+#define ATARI_RESET_DEASSERT  GPIOA->BSRRH = GPIO_Pin_3; /* RST -> GPIO(A.3) HIGH */
+
+#define MEMORY_EXPANSION_TYPE    (GPIOA->IDR & 0x0007) /* PA0, PA1, PA2 */
 
 /* Default values?? TODO: */
 static uint8_t PORTB = 0xFF;
@@ -116,6 +123,29 @@ static int debuglevel = DBG_INFO;
 static GPIO_InitTypeDef  GPIO_InitStructure;
 static void config_gpio()
 {
+	/* Configuration PINS are PA0, PA1 and PA2
+	 * As well as the mRST and mREF signals are now on PORTA (A.3 and A.4)
+	 * leaving the PORTE only for DATABUS to optimize code handling
+	 * (no more shifts...)
+	 */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	/* CONF0 -> PA0, CONF1 -> PA1, CONF2 -> PA3 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	/* Configure for RST & REF as output (100Mhz) */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 | GPIO_Pin_4;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
 	/* Green LED -> PB0, Red TP1 -> PB1, RD5 -> PB2, RD4 -> PB4
 	 * PB5 -> NC, PB6 -> UNUSED (PU), PB7 -> D1xx, PB8 -> EXSEL,
 	 * PB9 -> UNUSED (PU), PB10 -> HALT, PB11 -> MPD, PB12 -> IRQ */
@@ -164,20 +194,12 @@ static void config_gpio()
 
 	/* Configure GPIO Settings (25Mhz) */
 	GPIO_InitStructure.GPIO_Pin =
-		GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 |
-		GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+		GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 |
+		GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;	// avoid sharp edges
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
-	GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	/* Configure for RST & REF as output (100Mhz) */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	/* Input Address GPIO pins on PD{0..15} */
@@ -312,6 +334,13 @@ int main(void)
 	uint8_t c;
 
 	config_gpio();
+
+	/* KEEP ATARI IN RESET */
+	ATARI_RESET_ASSERT
+
+	/* Read configuration DIP-SWITCHES */
+	expansion_type = MEMORY_EXPANSION_TYPE;
+
 	config_uart(115200);
 
 	banner( expansion_type );
@@ -322,6 +351,9 @@ int main(void)
 	SET_DATA_MODE_IN
 
 	__disable_irq();
+
+	/* REMOVE ATARI FROM RESET STATE */
+	ATARI_RESET_DEASSERT
 
 	while (1) {
 		/* 
@@ -349,18 +381,17 @@ int main(void)
 					// read the data bus on falling edge of phi2
 					while (CONTROL_IN & PHI2)
 						data = DATA_IN;
-					// Only the upper 8 bit of the port for DATA are used
-					PBCTL = (data & 0xff00) >> 8;
+					PBCTL = data;
 				}
 				else
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
-					// Only the upper 8 bit of the port for DATA are used
-					DATA_OUT = PBCTL << 8;
+					DATA_OUT = PBCTL;
 
 					// wait for phi2 low
-					while (CONTROL_IN & PHI2) ;
+					while (CONTROL_IN & PHI2)
+						;
 					SET_DATA_MODE_IN
 				}
 				break;
@@ -374,18 +405,17 @@ int main(void)
 					// read the data bus on falling edge of phi2
 					while (CONTROL_IN & PHI2)
 						data = DATA_IN;
-					// Only the upper 8 bit of the port for DATA are used
-					PORTB = (data & 0xff00) >> 8;
+					PORTB = data;
 				}
 				else
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
-					// Only the upper 8 bit of the port for DATA are used
-					DATA_OUT = PORTB << 8;
+					DATA_OUT = PORTB;
 
 					// wait for phi2 low
-					while (CONTROL_IN & PHI2) ;
+					while (CONTROL_IN & PHI2)
+						;
 					SET_DATA_MODE_IN
 				}
 				break;
@@ -420,9 +450,6 @@ int main(void)
 							// read the data bus on falling edge of phi2
 							while (CONTROL_IN & PHI2)
 								data = DATA_IN;
-
-							// Only the upper 8 bit of the port for DATA are used
-							data = (data & 0xff00) >> 8;
 
 							// Now we can write the data at the desired address
 							// stored in the external ram expansion
@@ -472,7 +499,7 @@ int main(void)
 									// CPU Needs to READ Data from internal memory
 									SET_DATA_MODE_OUT
 									// Only the upper 8 bit of the port for DATA are used
-									DATA_OUT = (expansion_ram[ addr + (bank * 0x4000) ]) << 8;
+									DATA_OUT = (expansion_ram[ addr + (bank * 0x4000) ]);
 #else
 									CHIPRAM_BANKSELECT(bank);
 #endif
@@ -500,7 +527,7 @@ int main(void)
 								default:
 									// CPU Needs to READ Data. We give it the nop opcode!
 									SET_DATA_MODE_OUT
-									DATA_OUT = (0xEA << 8); /* NOP 6502 */
+									DATA_OUT = 0xEA; /* NOP 6502 */
 									break;
 							}
 							// wait for phi2 low
