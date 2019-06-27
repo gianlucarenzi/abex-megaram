@@ -1,4 +1,4 @@
-(pcb "/home/debian/Progetti/ATARI/abex-megaram/abex-megaram.dsn"
+(pcb "/home/debian/Progetti/Atari/abex-megaram/abex-megaram.dsn"
   (parser
     (string_quote ")
     (space_in_quoted_tokens on)
@@ -931,10 +931,10 @@
       (pins P1-A14 U14-51)
     )
     (net ~mRST
-      (pins P1-A2 U14-97)
+      (pins P1-A2 U14-26)
     )
     (net ~mREF
-      (pins P1-A8 U14-98)
+      (pins P1-A8 U14-29)
     )
     (net ~mCCTL
       (pins P1-A30 U14-33)
@@ -1003,28 +1003,28 @@
       (pins P1-A28 U14-37 R29-1 R28-2)
     )
     (net mD0
-      (pins P1-B15 U14-39 U8-13 U7-13)
+      (pins P1-B15 U14-97 U8-13 U7-13)
     )
     (net mD1
-      (pins P1-B13 U14-40 U8-14 U7-14)
+      (pins P1-B13 U14-98 U8-14 U7-14)
     )
     (net mD2
-      (pins P1-B11 U14-41 U8-15 U7-15)
+      (pins P1-B11 U14-1 U8-15 U7-15)
     )
     (net mD3
-      (pins P1-B9 U14-42 U8-17 U7-17)
+      (pins P1-B9 U14-2 U8-17 U7-17)
     )
     (net mD4
-      (pins P1-B7 U14-43 U8-18 U7-18)
+      (pins P1-B7 U14-3 U8-18 U7-18)
     )
     (net mD5
-      (pins P1-B5 U14-44 U8-19 U7-19)
+      (pins P1-B5 U14-4 U8-19 U7-19)
     )
     (net mD6
-      (pins P1-B3 U14-45 U8-20 U7-20)
+      (pins P1-B3 U14-5 U8-20 U7-20)
     )
     (net mD7
-      (pins P1-B1 U14-46 U8-21 U7-21)
+      (pins P1-B1 U14-38 U8-21 U7-21)
     )
     (net mW/~R
       (pins U8-24 U7-24 U1-2)
@@ -1102,10 +1102,10 @@
       (pins U14-96 R32-2)
     )
     (net VCC_3V3
-      (pins P1-B19 P1-A19 P1-A3 P1-A7 P1-A11 P1-A15 P1-A23 P1-A27 P1-A31 P1-B23 U14-6
-        U14-11 U14-19 U14-21 U14-22 U14-28 U14-50 U14-75 U14-100 U8-32 U7-32 U1-14
-        R32-1 R31-1 R28-1 R26-1 R6-2 JP2-4 C32-2 C31-2 C27-2 C26-2 C25-2 C24-2 C23-2
-        C22-2 C21-2 C5-1 C4-1 R5-1 R7-1 R8-1)
+      (pins P1-B19 P1-A19 P1-A3 P1-A7 P1-A11 P1-A15 P1-A23 P1-A27 P1-B23 U14-6 U14-11
+        U14-19 U14-21 U14-22 U14-28 U14-50 U14-75 U14-100 U8-32 U7-32 U1-14 R32-1
+        R31-1 R28-1 R26-1 R6-2 JP2-4 C32-2 C31-2 C27-2 C26-2 C25-2 C24-2 C23-2 C22-2
+        C21-2 C5-1 C4-1 R5-1 R7-1 R8-1)
     )
     (net SWDRST
       (pins P1-B31 U14-14 SW2-2 R6-1 JP1-1 C30-2)
@@ -1141,21 +1141,21 @@
       (pins U14-25 R8-2 SW1-4)
     )
     (class kicad_default "" GND LEDGRN_MEM "Net-(BOOT0_MEM1-Pad1)" "Net-(BOOT1_MEM1-Pad1)"
-      "Net-(C19-Pad1)" "Net-(C20-Pad1)" "Net-(D5-Pad2)" "Net-(P2-Pad1)" "Net-(P3-Pad1)"
-      "Net-(P4-Pad1)" "Net-(P5-Pad1)" "Net-(R18-Pad1)" "Net-(R19-Pad1)" "Net-(R2-Pad1)"
-      "Net-(R26-Pad2)" "Net-(R3-Pad1)" "Net-(R30-Pad1)" "Net-(R4-Pad1)" "Net-(U1-Pad10)"
-      "Net-(U1-Pad12)" "Net-(U1-Pad6)" "Net-(U1-Pad8)" "Net-(U14-Pad1)" "Net-(U14-Pad18)"
-      "Net-(U14-Pad2)" "Net-(U14-Pad23)" "Net-(U14-Pad24)" "Net-(U14-Pad25)"
-      "Net-(U14-Pad26)" "Net-(U14-Pad29)" "Net-(U14-Pad3)" "Net-(U14-Pad30)"
-      "Net-(U14-Pad31)" "Net-(U14-Pad32)" "Net-(U14-Pad38)" "Net-(U14-Pad4)"
-      "Net-(U14-Pad5)" "Net-(U14-Pad52)" "Net-(U14-Pad53)" "Net-(U14-Pad54)"
-      "Net-(U14-Pad63)" "Net-(U14-Pad64)" "Net-(U14-Pad67)" "Net-(U14-Pad70)"
-      "Net-(U14-Pad71)" "Net-(U14-Pad77)" "Net-(U14-Pad89)" "Net-(U14-Pad91)"
-      PB6 PB9 SWDCLK SWDIO SWDRST TP1 UART_RX UART_TX VCAP_1_MEM VCAP_2_MEM
-      VCC_3V3 mA0 mA1 mA10 mA11 mA12 mA13 mA14 mA15 mA2 mA3 mA4 mA5 mA6 mA7
-      mA8 mA9 mAUDIO mB0 mB1 mB2 mB3 mB4 mB5 mB6 mB7 mCONF0 mCONF1 mCONF2
-      mD0 mD1 mD2 mD3 mD4 mD5 mD6 mD7 mPHI2 mR/~W mRD4 mRD5 mW/~R ~mB5 ~mCCTL
-      ~mD1XX ~mEXSEL ~mHALT ~mIRQ ~mMPD ~mREF ~mRST ~mS4 ~mS5
+      "Net-(C19-Pad1)" "Net-(C20-Pad1)" "Net-(D5-Pad2)" "Net-(P1-PadA31)"
+      "Net-(P2-Pad1)" "Net-(P3-Pad1)" "Net-(P4-Pad1)" "Net-(P5-Pad1)" "Net-(R18-Pad1)"
+      "Net-(R19-Pad1)" "Net-(R2-Pad1)" "Net-(R26-Pad2)" "Net-(R3-Pad1)" "Net-(R30-Pad1)"
+      "Net-(R4-Pad1)" "Net-(U1-Pad10)" "Net-(U1-Pad12)" "Net-(U1-Pad6)" "Net-(U1-Pad8)"
+      "Net-(U14-Pad18)" "Net-(U14-Pad30)" "Net-(U14-Pad31)" "Net-(U14-Pad32)"
+      "Net-(U14-Pad39)" "Net-(U14-Pad40)" "Net-(U14-Pad41)" "Net-(U14-Pad42)"
+      "Net-(U14-Pad43)" "Net-(U14-Pad44)" "Net-(U14-Pad45)" "Net-(U14-Pad46)"
+      "Net-(U14-Pad52)" "Net-(U14-Pad53)" "Net-(U14-Pad54)" "Net-(U14-Pad63)"
+      "Net-(U14-Pad64)" "Net-(U14-Pad67)" "Net-(U14-Pad70)" "Net-(U14-Pad71)"
+      "Net-(U14-Pad77)" "Net-(U14-Pad89)" "Net-(U14-Pad91)" PB6 PB9 SWDCLK
+      SWDIO SWDRST TP1 UART_RX UART_TX VCAP_1_MEM VCAP_2_MEM VCC_3V3 mA0 mA1
+      mA10 mA11 mA12 mA13 mA14 mA15 mA2 mA3 mA4 mA5 mA6 mA7 mA8 mA9 mAUDIO
+      mB0 mB1 mB2 mB3 mB4 mB5 mB6 mB7 mCONF0 mCONF1 mCONF2 mD0 mD1 mD2 mD3
+      mD4 mD5 mD6 mD7 mPHI2 mR/~W mRD4 mRD5 mW/~R ~mB5 ~mCCTL ~mD1XX ~mEXSEL
+      ~mHALT ~mIRQ ~mMPD ~mREF ~mRST ~mS4 ~mS5
       (circuit
         (use_via Via[0-1]_400:300_um)
       )

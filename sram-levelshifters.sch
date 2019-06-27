@@ -190,7 +190,6 @@ LIBS:CPLD_Altera
 LIBS:Amplifier_Video
 LIBS:Amplifier_Instrumentation
 LIBS:Amplifier_Buffer
-LIBS:ft232rl
 LIBS:AmigaComponents
 LIBS:abex-megaram-cache
 EELAYER 25 0

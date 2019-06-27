@@ -190,7 +190,6 @@ LIBS:CPLD_Altera
 LIBS:Amplifier_Video
 LIBS:Amplifier_Instrumentation
 LIBS:Amplifier_Buffer
-LIBS:ft232rl
 LIBS:AmigaComponents
 LIBS:abex-megaram-cache
 EELAYER 25 0
@@ -695,8 +694,6 @@ Connection ~ 6150 4350
 Text GLabel 6350 2100 1    39   BiDi ~ 0
 VCC_3V3
 Wire Wire Line
-	4850 2100 4850 5350
-Wire Wire Line
 	4850 2550 5200 2550
 Wire Wire Line
 	4850 2950 5200 2950
@@ -716,9 +713,6 @@ Connection ~ 4850 4150
 Wire Wire Line
 	4850 4950 5200 4950
 Connection ~ 4850 4550
-Wire Wire Line
-	4850 5350 5200 5350
-Connection ~ 4850 4950
 Wire Wire Line
 	6000 4550 6350 4550
 Wire Wire Line
@@ -744,4 +738,9 @@ Wire Notes Line
 	3800 1200 3800 1350
 Text Notes 4050 1450 0    60   ~ 12
 ABEX PCI EXPRESS CARD CONNECTOR 64 PIN
+Wire Wire Line
+	4850 4950 4850 2100
+NoConn ~ 5200 5350
+Text Notes 4000 6050 0    59   ~ 12
+A31 is +5VDC. We do not need here
 $EndSCHEMATC
