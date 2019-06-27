@@ -15,7 +15,6 @@ include Makefile.board
 C_SOURCES =  \
 	src/main.c \
 	src/system_stm32f4xx.c \
-	src/tiny_printf.c \
 	
 
 C_SOURCES += \
@@ -103,8 +102,16 @@ $(BUILD_DIR):
 #######################################
 # clean up
 #######################################
-clean:
+distclean:
 	-rm -fR $(BUILD_DIR)
+
+
+clean:
+	-rm $(BUILD_DIR)/*.d
+	-rm $(BUILD_DIR)/*.lst
+	-rm $(BUILD_DIR)/*.o
+	-rm $(BUILD_DIR)/*.map
+
 
 #######################################
 # dependencies
