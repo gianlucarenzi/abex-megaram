@@ -40,53 +40,53 @@ unsigned char expansion_ram[64*1024] __attribute__((section(".ccmram")));
 #undef  USE_INTERNAL_CCRAM_EXPANSION
 
 typedef enum {
-	EXPANSION_TYPE_130XE = 0,       /* 0 0 0 */
-	EXPANSION_TYPE_192K_COMPYSHOP,  /* 0 0 1 */
-	EXPANSION_TYPE_320K_RAMBO,      /* 0 1 0 */
-	EXPANSION_TYPE_320K_COMPYSHOP,  /* 0 1 1 */
-	EXPANSION_TYPE_576K_MOD,        /* 1 0 0 */
-	EXPANSION_TYPE_1088K_MOD,       /* 1 0 1 */
-	                                /* 1 1 0 */
-	                                /* 1 1 1 */
-	EXPANSION_TYPE_NONE, // LAST
+    EXPANSION_TYPE_130XE = 0,       /* 0 0 0 */
+    EXPANSION_TYPE_192K_COMPYSHOP,  /* 0 0 1 */
+    EXPANSION_TYPE_320K_RAMBO,      /* 0 1 0 */
+    EXPANSION_TYPE_320K_COMPYSHOP,  /* 0 1 1 */
+    EXPANSION_TYPE_576K_MOD,        /* 1 0 0 */
+    EXPANSION_TYPE_1088K_MOD,       /* 1 0 1 */
+                                    /* 1 1 0 */
+                                    /* 1 1 1 */
+    EXPANSION_TYPE_NONE,            // LAST
 } t_expansion;
 
-#define RD5_LOW  GPIOB->BSRRH  = GPIO_Pin_2;
-#define RD4_LOW  GPIOB->BSRRH  = GPIO_Pin_4;
-#define RD5_HIGH GPIOB->BSRRL  = GPIO_Pin_2;
-#define RD4_HIGH GPIOB->BSRRL  = GPIO_Pin_4;
+#define RD5_LOW     GPIOB->BSRRH  = GPIO_Pin_2;
+#define RD4_LOW     GPIOB->BSRRH  = GPIO_Pin_4;
+#define RD5_HIGH    GPIOB->BSRRL  = GPIO_Pin_2;
+#define RD4_HIGH    GPIOB->BSRRL  = GPIO_Pin_4;
 
-#define CONTROL_IN GPIOC->IDR
-#define ADDR_IN    GPIOD->IDR
-#define DATA_IN    GPIOE->IDR
-#define DATA_OUT   GPIOE->ODR
+#define CONTROL_IN  GPIOC->IDR
+#define ADDR_IN     GPIOD->IDR
+#define DATA_IN     GPIOE->IDR
+#define DATA_OUT    GPIOE->ODR
 
 #define PHI2_RD        (GPIOC->IDR & 0x0001)
 #define S5_RD          (GPIOC->IDR & 0x0002)
 #define S4_RD          (GPIOC->IDR & 0x0004)
 #define S4_AND_S5_HIGH (GPIOC->IDR & 0x0006) == 0x6
 
-#define PHI2	0x0001
-#define S5		0x0002
-#define S4		0x0004
-#define CCTL	0x0010
-#define RW		0x0020
+#define PHI2    0x0001
+#define S5      0x0002
+#define S4      0x0004
+#define CCTL    0x0010
+#define RW      0x0020
 
-#define SET_DATA_MODE_IN  GPIOE->MODER = 0x00000000;
-#define SET_DATA_MODE_OUT GPIOE->MODER = 0x00005555;
+#define SET_DATA_MODE_IN        GPIOE->MODER = 0x00000000;
+#define SET_DATA_MODE_OUT       GPIOE->MODER = 0x00005555;
 
-#define GREEN_LED_OFF GPIOB->BSRRH = GPIO_Pin_0;
-#define GREEN_LED_ON  GPIOB->BSRRL = GPIO_Pin_0;
+#define GREEN_LED_OFF           GPIOB->BSRRH = GPIO_Pin_0;
+#define GREEN_LED_ON            GPIOB->BSRRL = GPIO_Pin_0;
 
-#define INTERNAL_RAM_DISABLE GPIOB->BSRRL = GPIO_Pin_8;
-#define INTERNAL_RAM_ENABLE  GPIOB->BSRRH = GPIO_Pin_8;
+#define INTERNAL_RAM_DISABLE    GPIOB->BSRRL = GPIO_Pin_8;
+#define INTERNAL_RAM_ENABLE     GPIOB->BSRRH = GPIO_Pin_8;
 
-#define CHIPRAM_BANKSELECT(a)	(GPIO_Write(GPIOC, a << 8)); /* HIGH BYTE PC8-PC15 */
+#define CHIPRAM_BANKSELECT(a)   (GPIO_Write(GPIOC, a << 8)); /* HIGH BYTE PC8-PC15 */
 
-#define ATARI_RESET_ASSERT    GPIOA->BSRRL = GPIO_Pin_3; /* RST -> GPIO(A.3) LOW */
-#define ATARI_RESET_DEASSERT  GPIOA->BSRRH = GPIO_Pin_3; /* RST -> GPIO(A.3) HIGH */
+#define ATARI_RESET_ASSERT      GPIOA->BSRRL = GPIO_Pin_3; /* RST -> GPIO(A.3) LOW */
+#define ATARI_RESET_DEASSERT    GPIOA->BSRRH = GPIO_Pin_3; /* RST -> GPIO(A.3) HIGH */
 
-#define MEMORY_EXPANSION_TYPE    (GPIOA->IDR & 0x0007) /* PA0, PA1, PA2 */
+#define MEMORY_EXPANSION_TYPE   (GPIOA->IDR & 0x0007) /* PA0, PA1, PA2 */
 
 /* Default values?? TODO: */
 static uint8_t PORTB = 0xFF;
@@ -107,21 +107,21 @@ enum {
 	DBG_NOISY,
 };
 static int debuglevel = DBG_INFO;
-#define print(str)	USART_PutString(str)
+#define print(str)  USART_PutString(str)
 /* ANSI Eye-Candy ;-) */
 #define ANSI_RED    "\x1b[31m"
 #define ANSI_GREEN  "\x1b[32m"
 #define ANSI_YELLOW "\x1b[1;33m"
 #define ANSI_BLUE   "\x1b[1;34m"
 #define ANSI_RESET  "\x1b[0m"
-#define DBG_E(str)	print(ANSI_RED); print(str); print(ANSI_RESET);
-#define DBG_I(str)	if (debuglevel >= DBG_INFO) { print(ANSI_GREEN); print(str); print(ANSI_RESET); }
-#define DBG_V(str)	if (debuglevel >= DBG_VERBOSE) { print(ANSI_BLUE); print(str); printf(ANSI_RESET); }
-#define DBG_N(str)	if (debuglevel >= DBG_NOISY) { print(ANSI_YELLOW); print(str); printf(ANSI_RESET); }
+#define DBG_E(str)  print(ANSI_RED); print(str); print(ANSI_RESET);
+#define DBG_I(str)  if (debuglevel >= DBG_INFO)    { print(ANSI_GREEN);  print(str); print(ANSI_RESET); }
+#define DBG_V(str)  if (debuglevel >= DBG_VERBOSE) { print(ANSI_BLUE);   print(str); print(ANSI_RESET); }
+#define DBG_N(str)  if (debuglevel >= DBG_NOISY)   { print(ANSI_YELLOW); print(str); print(ANSI_RESET); }
 
 
 static GPIO_InitTypeDef  GPIO_InitStructure;
-static void config_gpio()
+static void config_gpio(void)
 {
 	/* Configuration PINS are PA0, PA1 and PA2
 	 * As well as the mRST and mREF signals are now on PORTA (A.3 and A.4)
@@ -145,7 +145,7 @@ static void config_gpio()
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
+
 	/* Green LED -> PB0, Red TP1 -> PB1, RD5 -> PB2, RD4 -> PB4
 	 * PB5 -> NC, PB6 -> UNUSED (PU), PB7 -> D1xx, PB8 -> EXSEL,
 	 * PB9 -> UNUSED (PU), PB10 -> HALT, PB11 -> MPD, PB12 -> IRQ */
@@ -198,7 +198,7 @@ static void config_gpio()
 		GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;	// avoid sharp edges
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;   // avoid sharp edges
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
@@ -217,7 +217,6 @@ static void config_gpio()
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
-
 }
 
 /* Useful for redirecting stdout output to serial line */
@@ -316,14 +315,14 @@ static void banner(t_expansion type)
 }
 
 /*
-	Theory of Operation
-	-------------------
-	Atari sends memory bank setup writing/reading from PORTB & PBCTL addresses.
+    Theory of Operation
+    -------------------
+    Atari sends memory bank setup writing/reading from PORTB & PBCTL addresses.
 
-	Any access into the window 0x4000-0x7FFF will be forced to use the
-	expanded memory instead of the internal one. The EXSEL pin will be
-	activated to ensure no internal RAM access will be used.
-	It will be re-activated after sent into the bus...
+    Any access into the window 0x4000-0x7FFF will be forced to use the
+    expanded memory instead of the internal one. The EXSEL pin will be
+    activated to ensure no internal RAM access will be used.
+    It will be re-activated after sent into the bus...
 */
 
 int main(void)
@@ -338,7 +337,7 @@ int main(void)
 	/* KEEP ATARI IN RESET */
 	ATARI_RESET_ASSERT
 
-	/* Read configuration DIP-SWITCHES */
+	/* Read configuration DIP-SWITCHES from PORT! */
 	expansion_type = MEMORY_EXPANSION_TYPE;
 
 	config_uart(115200);
@@ -355,7 +354,8 @@ int main(void)
 	/* REMOVE ATARI FROM RESET STATE */
 	ATARI_RESET_DEASSERT
 
-	while (1) {
+	while (1)
+	{
 		/* 
 		 * Emulating of PORTB/PBCTL and RAM selection bits when
 		 * accessing 0x4000-0x7FFF area.
@@ -364,7 +364,8 @@ int main(void)
 		// Wait for a valid sequence in the bus
 
 		// wait for phi2 high
-		while (!((c = CONTROL_IN) & PHI2)) ;
+		while (!((c = CONTROL_IN) & PHI2))
+			;
 
 		// Check for address only if there is a valid state of the PHI2
 		// on the bus!
