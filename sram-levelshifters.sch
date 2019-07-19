@@ -327,10 +327,8 @@ Wire Notes Line
 	10100 6200 5350 6200
 Wire Wire Line
 	7050 3300 7250 3300
-Wire Wire Line
-	7250 3300 7250 4350
-Text GLabel 7250 4350 3    39   BiDi ~ 0
-mB5
+Text GLabel 7250 4250 3    39   BiDi ~ 0
+mCS_512K
 Text Notes 5600 5350 0    79   ~ 16
 EXTERNAL RAM ACCESS WILL ASSERT THE EXTSEL SIGNAL (code)
 $Comp
@@ -438,8 +436,6 @@ Wire Wire Line
 	9250 3350 9450 3350
 Wire Wire Line
 	9450 3350 9450 4400
-Text GLabel 9450 4400 3    39   BiDi ~ 0
-~mB5
 Wire Wire Line
 	5500 3600 6050 3600
 Wire Wire Line
@@ -591,10 +587,6 @@ F 3 "" H 3200 2200 50  0001 C CNN
 	2    3200 2200
 	1    0    0    -1  
 $EndComp
-Text GLabel 2900 2200 0    39   Input ~ 0
-mB5
-Text GLabel 3500 2200 2    39   Output ~ 0
-~mB5
 Text Notes 1300 1350 0    79   ~ 16
 INVERTER LOGIC FOR SEPARATED READ/WRITE ACCESS
 $Comp
@@ -675,7 +667,7 @@ F 3 "" H 2250 2200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2900 2600 2900 3800
+	2900 2200 2900 3800
 Connection ~ 2900 3000
 Connection ~ 2900 3400
 NoConn ~ 3500 2600
@@ -696,4 +688,10 @@ $EndComp
 Wire Wire Line
 	2800 3200 2900 3200
 Connection ~ 2900 3200
+Connection ~ 2900 2600
+NoConn ~ 3500 2200
+Wire Wire Line
+	7250 3300 7250 4250
+Text GLabel 9450 4400 3    39   BiDi ~ 0
+mCS_1024K
 $EndSCHEMATC
