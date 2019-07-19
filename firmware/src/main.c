@@ -28,8 +28,6 @@
 	#define strnicmp strncasecmp
 #endif
 
-unsigned char expansion_ram[64*1024] __attribute__((section(".ccmram")));
-
 /*
  * We can use internal ccmram as EXPANSION_TYPE_130XE because we need
  * only 64k of ram.
@@ -38,6 +36,22 @@ unsigned char expansion_ram[64*1024] __attribute__((section(".ccmram")));
  */
 #define USE_INTERNAL_CCRAM_EXPANSION
 #undef  USE_INTERNAL_CCRAM_EXPANSION
+#define USE_INTERNAL_DATARAM_EXPANSION
+#undef  USE_INTERNAL_DATARAM_EXPANSION
+
+#if defined(USE_INTERNAL_CCRAM_EXPANSION) && defined(USE_INTERNAL_DATARAM_EXPANSION)
+	#error "ONLY ONE TYPE OF MEMORY CAN BE USED"
+#endif
+
+/*
+ * We can use the internal ccram and the sram as ram expansion
+ */
+#ifdef USE_INTERNAL_CCRAM_EXPANSION
+	unsigned char expansion_ram[64*1024] __attribute__((section(".ccmram")));
+#endif
+#ifdef USE_INTERNAL_DATARAM_EXPANSION
+	unsigned char expansion_ram[64*1024] __attribute__((section(".data")));
+#endif
 
 typedef enum {
     EXPANSION_TYPE_130XE = 0,       /* 0 0 0 */
@@ -78,17 +92,19 @@ typedef enum {
 #define GREEN_LED_OFF           GPIOB->BSRRH = GPIO_Pin_0;
 #define GREEN_LED_ON            GPIOB->BSRRL = GPIO_Pin_0;
 
-#define INTERNAL_RAM_DISABLE    GPIOB->BSRRL = GPIO_Pin_8;
-#define INTERNAL_RAM_ENABLE     GPIOB->BSRRH = GPIO_Pin_8;
-
-#define CHIPRAM_BANKSELECT(a)   (GPIO_Write(GPIOC, a << 8)); /* HIGH BYTE PC8-PC15 */
+#define INTERNAL_RAM_DISABLE    GPIOB->BSRRL = GPIO_Pin_8; /* nEXSEL */
+#define INTERNAL_RAM_ENABLE     GPIOB->BSRRH = GPIO_Pin_8; /* nEXSEL */
 
 #define ATARI_RESET_ASSERT      GPIOA->BSRRL = GPIO_Pin_3; /* RST -> GPIO(A.3) LOW */
 #define ATARI_RESET_DEASSERT    GPIOA->BSRRH = GPIO_Pin_3; /* RST -> GPIO(A.3) HIGH */
 
+#define CHIPRAM_BANKSELECT(a)   GPIOC->ODR = a << 8 /* HIGH BYTE PC8-PC12 */
+#define CS_512K                 (1 << 13) /* CS#0 PC13 */
+#define CS_1024K                (1 << 14) /* CS#0 PC14 */
 #define MEMORY_EXPANSION_TYPE   (GPIOA->IDR & 0x0007) /* PA0, PA1, PA2 */
+#define CHIPRAM_DESELECT        GPIOC->ODR = 0xffff0000 /* PC8-PC15 RAMCHIP DESELECTED */
 
-/* Default values?? TODO: */
+/* Default values?? TODO: Read Altirra's Manual... */
 static uint8_t PORTB = 0xFF;
 static uint8_t PBCTL = 0x00;
 
@@ -107,17 +123,17 @@ enum {
 	DBG_NOISY,
 };
 static int debuglevel = DBG_INFO;
-#define print(str)  USART_PutString(str)
+#define PDEBUG(str)  USART_PutString(str)
 /* ANSI Eye-Candy ;-) */
 #define ANSI_RED    "\x1b[31m"
 #define ANSI_GREEN  "\x1b[32m"
 #define ANSI_YELLOW "\x1b[1;33m"
 #define ANSI_BLUE   "\x1b[1;34m"
 #define ANSI_RESET  "\x1b[0m"
-#define DBG_E(str)  print(ANSI_RED); print(str); print(ANSI_RESET);
-#define DBG_I(str)  if (debuglevel >= DBG_INFO)    { print(ANSI_GREEN);  print(str); print(ANSI_RESET); }
-#define DBG_V(str)  if (debuglevel >= DBG_VERBOSE) { print(ANSI_BLUE);   print(str); print(ANSI_RESET); }
-#define DBG_N(str)  if (debuglevel >= DBG_NOISY)   { print(ANSI_YELLOW); print(str); print(ANSI_RESET); }
+#define DBG_E(str)  PDEBUG(ANSI_RED); PDEBUG(str); PDEBUG(ANSI_RESET);
+#define DBG_I(str)  if (debuglevel >= DBG_INFO)    { PDEBUG(ANSI_GREEN);  PDEBUG(str); PDEBUG(ANSI_RESET); }
+#define DBG_V(str)  if (debuglevel >= DBG_VERBOSE) { PDEBUG(ANSI_BLUE);   PDEBUG(str); PDEBUG(ANSI_RESET); }
+#define DBG_N(str)  if (debuglevel >= DBG_NOISY)   { PDEBUG(ANSI_YELLOW); PDEBUG(str); PDEBUG(ANSI_RESET); }
 
 
 static GPIO_InitTypeDef  GPIO_InitStructure;
@@ -278,40 +294,62 @@ static void banner(t_expansion type)
 	switch(type)
 	{
 		case EXPANSION_TYPE_130XE:
-			print(ANSI_BLUE);
-			print("130XE 128K EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("130XE 128K EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_192K_COMPYSHOP:
-			print(ANSI_BLUE);
-			print("192K COMPYSHOP EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("192K COMPYSHOP EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_320K_COMPYSHOP:
-			print(ANSI_BLUE);
-			print("320K COMPYSHOP EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("320K COMPYSHOP EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_320K_RAMBO:
-			print(ANSI_BLUE);
-			print("320K RAMBO EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("320K RAMBO EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_576K_MOD:
-			print(ANSI_BLUE);
-			print("576K MOD EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("576K MOD EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_1088K_MOD:
-			print(ANSI_BLUE);
-			print("1088K MOD EXPANSION\r\n");
-			print(ANSI_RESET);
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("1088K MOD EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
 			break;
 		default:
 			DBG_E("UNKNOWN EXPANSION TYPE!\r\n");
 			break;
 	}
 	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
+}
+
+static inline void activate_ram_chip(uint8_t bank)
+{
+	uint8_t CHIPSELECT = 0xff;
+	// 5 BITS (16K WINDOW x 32 banks PER CHIP)
+	// B0 B1 B2 B3 B4 
+	// 0  0  0  0  0
+	CHIPSELECT = bank & 0x1F;
+	if (bank < 32)
+	{
+		// we are referring the the first Chip
+		CHIPSELECT &= ~CS_512K;
+		CHIPSELECT |= CS_1024K;
+	}
+	else
+	{
+		// we are referring to the second Chip
+		CHIPSELECT &= ~CS_1024K;
+		CHIPSELECT |= CS_512K;
+	}
+	CHIPRAM_BANKSELECT(CHIPSELECT);
 }
 
 /*
@@ -349,6 +387,7 @@ int main(void)
 	// Start READING FROM DATABUS!
 	SET_DATA_MODE_IN
 
+	// Not needed if using FreeRTOS!
 	__disable_irq();
 
 	/* REMOVE ATARI FROM RESET STATE */
@@ -435,6 +474,7 @@ int main(void)
 					if (PBCTL & (1 << 2))
 					{
 						uint8_t bank;
+						int skipmemory = 1; 
 
 						// When accessing the external RAM the internal
 						// RAM must be disabled!
@@ -459,78 +499,89 @@ int main(void)
 							{
 								case EXPANSION_TYPE_130XE:
 									bank = (PORTB & 0x0c) >> 2;
+									skipmemory = 0;
 							#ifdef USE_INTERNAL_CCRAM_EXPANSION
 									expansion_ram[ addr + (bank * 0x4000) ] = data;
-							#else
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 1;
 							#endif
 									break;
 								case EXPANSION_TYPE_192K_COMPYSHOP:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0x40) >> 2)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_320K_RAMBO:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0x60) >> 1)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_320K_COMPYSHOP:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0xc0) >> 2)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_576K_MOD:
 									bank = (((PORTB & 0x0e) + ((PORTB & 0x60) >> 1)) >> 1);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_1088K_MOD:
 									bank = (((PORTB & 0x0e) + ((PORTB & 0xe0) >> 1)) >> 1);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								default:
+									bank = 0;
+									skipmemory = 1;
 									break; // Not implemented yet!
 							}
+
+							// Activate CHIP RAM if needed
+							if (!skipmemory) activate_ram_chip(bank);
 
 						}
 						else
 						{
+							// ATARI CPU needs to READ Data!
 							switch (expansion_type)
 							{
 								case EXPANSION_TYPE_130XE:
 									bank = (PORTB & 0x0c) >> 2;
+									skipmemory = 0;
 #ifdef USE_INTERNAL_CCRAM_EXPANSION
 									// CPU Needs to READ Data from internal memory
 									SET_DATA_MODE_OUT
 									// Only the upper 8 bit of the port for DATA are used
 									DATA_OUT = (expansion_ram[ addr + (bank * 0x4000) ]);
-#else
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 1;
 #endif
 									break;
 								case EXPANSION_TYPE_192K_COMPYSHOP:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0x40) >> 2)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_320K_RAMBO:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0x60) >> 1)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_320K_COMPYSHOP:
 									bank = (((PORTB & 0x0c) + ((PORTB & 0xc0) >> 2)) >> 2);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_576K_MOD:
 									bank = (((PORTB & 0x0e) + ((PORTB & 0x60) >> 1)) >> 1);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								case EXPANSION_TYPE_1088K_MOD:
 									bank = (((PORTB & 0x0e) + ((PORTB & 0xe0) >> 1)) >> 1);
-									CHIPRAM_BANKSELECT(bank);
+									skipmemory = 0;
 									break;
 								default:
 									// CPU Needs to READ Data. We give it the nop opcode!
 									SET_DATA_MODE_OUT
 									DATA_OUT = 0xEA; /* NOP 6502 */
+									skipmemory = 1;
 									break;
 							}
+
+							// ACTIVATE RAM CHIP if needed
+							if (!skipmemory) activate_ram_chip(bank);
+
 							// wait for phi2 low
 							while (CONTROL_IN & PHI2)
 								;
@@ -539,15 +590,21 @@ int main(void)
 						GREEN_LED_OFF;
 
 						INTERNAL_RAM_ENABLE;
+						CHIPRAM_DESELECT;
 					}
 					else
 					{
-						// PBCTL Bit 2 is not set, so do nothing
+						// PBCTL Bit 2 is not set, so do nothing with
+						// external memory
+						INTERNAL_RAM_ENABLE;
+						CHIPRAM_DESELECT;
 					}
 				}
 				else
 				{
 					// Idle
+					INTERNAL_RAM_ENABLE;
+					CHIPRAM_DESELECT;
 				}
 				break;
 		}
