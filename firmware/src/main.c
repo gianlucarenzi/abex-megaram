@@ -65,6 +65,11 @@ typedef enum {
     EXPANSION_TYPE_NONE,            // LAST
 } t_expansion;
 
+typedef enum {
+	WRITERAM = 0,
+	READRAM,
+} t_command;
+
 #define RD5_LOW     GPIOB->BSRRH  = GPIO_Pin_2;
 #define RD4_LOW     GPIOB->BSRRH  = GPIO_Pin_4;
 #define RD5_HIGH    GPIOB->BSRRL  = GPIO_Pin_2;
@@ -79,10 +84,12 @@ typedef enum {
 #define S5_RD          (GPIOC->IDR & 0x0002)
 #define S4_RD          (GPIOC->IDR & 0x0004)
 #define S4_AND_S5_HIGH (GPIOC->IDR & 0x0006) == 0x6
+#define D1XX_RD        (GPIOC->IDR & 0x0008)
 
 #define PHI2    0x0001
 #define S5      0x0002
 #define S4      0x0004
+#define D1XX    0x0008
 #define CCTL    0x0010
 #define RW      0x0020
 
@@ -98,11 +105,17 @@ typedef enum {
 #define ATARI_RESET_ASSERT      GPIOA->BSRRL = GPIO_Pin_3; /* RST -> GPIO(A.3) LOW */
 #define ATARI_RESET_DEASSERT    GPIOA->BSRRH = GPIO_Pin_3; /* RST -> GPIO(A.3) HIGH */
 
-#define CHIPRAM_BANKSELECT(a)   GPIOC->ODR = a << 8 /* HIGH BYTE PC8-PC12 */
 #define CS_512K                 (1 << 13) /* CS#0 PC13 */
 #define CS_1024K                (1 << 14) /* CS#0 PC14 */
 #define MEMORY_EXPANSION_TYPE   (GPIOA->IDR & 0x0007) /* PA0, PA1, PA2 */
-#define CHIPRAM_DESELECT        GPIOC->ODR = 0xffff0000 /* PC8-PC15 RAMCHIP DESELECTED */
+#define CHIPRAM_DESELECT        GPIOC->ODR = 0xff00   /* PC8-PC15 RAMCHIP DESELECTED */
+
+/* RAM Pin nWE/nOE */
+#define mOE                     GPIO_Pin_14
+#define mWE                     GPIO_Pin_15
+#define READRAM_SET             { GPIOB->BSRRL = mOE; GPIOB->BSRRH = mWE; }
+#define WRITERAM_SET            { GPIOB->BSRRH = mOE; GPIOB->BSRRL = mWE; }
+#define CHIPRAM_DISABLE         { GPIOB->BSRRH = mOE; GPIOB->BSRRH = mWE; }
 
 /* Default values?? TODO: Read Altirra's Manual... */
 static uint8_t PORTB = 0xFF;
@@ -164,14 +177,15 @@ static void config_gpio(void)
 
 	/* Green LED -> PB0, Red TP1 -> PB1, RD5 -> PB2, RD4 -> PB4
 	 * PB5 -> NC, PB6 -> UNUSED (PU), PB7 -> D1xx, PB8 -> EXSEL,
-	 * PB9 -> UNUSED (PU), PB10 -> HALT, PB11 -> MPD, PB12 -> IRQ */
+	 * PB9 -> UNUSED (PU), PB10 -> HALT, PB11 -> MPD, PB12 -> IRQ 
+	 * PB13 -> UNUSED (PU), PB14 mOE -> mOE, PB15 mWE -> mWE */
 
 	/* GPIOB Periph clock enable (25Mhz) */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	/* Configure PB0, PB1in output pushpull mode */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 |
-		GPIO_Pin_4 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_10 |
-		GPIO_Pin_11 | GPIO_Pin_12;
+		GPIO_Pin_4 | GPIO_Pin_8 | GPIO_Pin_10 |
+		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_14 | GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
@@ -179,15 +193,16 @@ static void config_gpio(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	/* Input Signals GPIO pins on PHI2 -> PC0, /S5 -> PC1, /S4 ->PC2,
-	 * CCTL -> PC4, R/W -> PC5, PC8 -> A14, -> PC9 -> A15, PC10 -> A16,
-	 * PC11 -> A17, PC12 -> A18, PC13 -> nCS , PC14 -> NU, PC15 -> NU */
+	 * D1XX -> PC3, CCTL -> PC4, R/W -> PC5, PC8 -> A14, -> PC9 -> A15,
+	 * PC10 -> A16, PC11 -> A17, PC12 -> A18, PC13 -> nCS0 ,
+	 * PC14 -> nCS1, PC15 -> NU */
 
 	/* GPIOC Periph clock enable */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
 	/* Configure GPIO Settings (100Mhz) */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 |
-		GPIO_Pin_4 | GPIO_Pin_5;
+		GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -196,7 +211,7 @@ static void config_gpio(void)
 
 	/* Configure GPIO for RAM EXTRA ADDRESS (100Mhz) */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 |
-		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13;
+		GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -206,7 +221,7 @@ static void config_gpio(void)
 	/* GPIOE Periph clock enable */
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 
-	/* Input/Output data GPIO pins on PE{8..15} */
+	/* Input/Output data GPIO pins on PE{0..7} */
 
 	/* Configure GPIO Settings (25Mhz) */
 	GPIO_InitStructure.GPIO_Pin =
@@ -330,13 +345,19 @@ static void banner(t_expansion type)
 	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
 }
 
-static inline void activate_ram_chip(uint8_t bank)
+
+#define CHIPRAM_BANKSELECT(a)   GPIOC->ODR = a & 0xff00 /* HIGH BYTE PC8-PC12 */
+static inline void activate_ram_chip(uint8_t bank, t_command op)
 {
-	uint8_t CHIPSELECT = 0xff;
+	uint16_t CHIPSELECT; /* All used bit for bank & chip addressing */
 	// 5 BITS (16K WINDOW x 32 banks PER CHIP)
-	// B0 B1 B2 B3 B4 
-	// 0  0  0  0  0
-	CHIPSELECT = bank & 0x1F;
+	// B0 B1 B2 B3 B4 B5 B6 B7
+	// X  X  X  X  X  X  -- --
+	// Banks can be from 0 to 63
+	// HARDWARE CONNECTIONS
+	// C8  C9  C10  C11  C12  C13  C14  C15
+	// 0   0   0    0    0    CS0  CS1   NC
+	CHIPSELECT = (bank & 0x1F) << 8;
 	if (bank < 32)
 	{
 		// we are referring the the first Chip
@@ -348,6 +369,18 @@ static inline void activate_ram_chip(uint8_t bank)
 		// we are referring to the second Chip
 		CHIPSELECT &= ~CS_1024K;
 		CHIPSELECT |= CS_512K;
+	}
+
+	// Now select nOE (LOW) and nWE (high) for READING FROM RAM
+	// or nOE (HIGH) and nWE (low) for WRITING TO RAM
+	switch( op )
+	{
+		case READRAM:
+			READRAM_SET;
+			break;
+		case WRITERAM:
+			WRITERAM_SET;
+			break;
 	}
 	CHIPRAM_BANKSELECT(CHIPSELECT);
 }
@@ -395,6 +428,10 @@ int main(void)
 
 	while (1)
 	{
+		/* First of all, the external ram is always disabled */
+		CHIPRAM_DESELECT;
+		CHIPRAM_DISABLE;
+
 		/* 
 		 * Emulating of PORTB/PBCTL and RAM selection bits when
 		 * accessing 0x4000-0x7FFF area.
@@ -486,12 +523,6 @@ int main(void)
 						// ATARI CPU Needs to WRITE Data?
 						if (!(c & RW))
 						{
-							// Now READs the data to be written
-							data = DATA_IN;
-							// read the data bus on falling edge of phi2
-							while (CONTROL_IN & PHI2)
-								data = DATA_IN;
-
 							// Now we can write the data at the desired address
 							// stored in the external ram expansion
 							// Let's calculate the correct bank address
@@ -501,6 +532,11 @@ int main(void)
 									bank = (PORTB & 0x0c) >> 2;
 									skipmemory = 0;
 							#ifdef USE_INTERNAL_CCRAM_EXPANSION
+									// Now READs the data to be written in internal memory
+									data = DATA_IN;
+									// read the data bus on falling edge of phi2
+									while (CONTROL_IN & PHI2)
+										data = DATA_IN;
 									expansion_ram[ addr + (bank * 0x4000) ] = data;
 									skipmemory = 1;
 							#endif
@@ -532,8 +568,10 @@ int main(void)
 							}
 
 							// Activate CHIP RAM if needed
-							if (!skipmemory) activate_ram_chip(bank);
+							if (!skipmemory)
+								activate_ram_chip(bank, WRITERAM);
 
+							// The DATABUS it is directly connected to the RAM Chip
 						}
 						else
 						{
@@ -580,8 +618,12 @@ int main(void)
 							}
 
 							// ACTIVATE RAM CHIP if needed
-							if (!skipmemory) activate_ram_chip(bank);
+							if (!skipmemory)
+								activate_ram_chip(bank, READRAM);
 
+							// The memory chip should be prepare the DATA BUS with the correct
+							// data fetched from the address selected
+ 
 							// wait for phi2 low
 							while (CONTROL_IN & PHI2)
 								;
@@ -591,6 +633,7 @@ int main(void)
 
 						INTERNAL_RAM_ENABLE;
 						CHIPRAM_DESELECT;
+						CHIPRAM_DISABLE;
 					}
 					else
 					{
@@ -598,6 +641,7 @@ int main(void)
 						// external memory
 						INTERNAL_RAM_ENABLE;
 						CHIPRAM_DESELECT;
+						CHIPRAM_DISABLE;
 					}
 				}
 				else
@@ -605,6 +649,7 @@ int main(void)
 					// Idle
 					INTERNAL_RAM_ENABLE;
 					CHIPRAM_DESELECT;
+					CHIPRAM_DISABLE;
 				}
 				break;
 		}
