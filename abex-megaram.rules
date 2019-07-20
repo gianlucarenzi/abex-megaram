@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 1198)
+    (start_pass_no 451)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -81,16 +81,19 @@
     )
   )
   (class "kicad_default"
-    GND "Net-(D5-Pad2)" TP1 ~mEXSEL ~mD1XX ~mHALT ~mMPD ~mIRQ
-    ~mRST ~mREF ~mCCTL mA0 mA1 mA2 mA3 mA4
-    mA5 mA6 mA7 mA8 mA9 mA10 mA11 mA12
-    mA13 mA14 mA15 mR/~W ~mS4 mRD4 ~mS5 mRD5
-    mD0 mD1 mD2 mD3 mD4 mD5 mD6 mD7
-    "UART_RX" "UART_TX" mB7 "LEDGRN_MEM" mB3 mB1 mB2 mB4
-    mB0 "Net-(BOOT0_MEM1-Pad1)" "Net-(BOOT1_MEM1-Pad1)" "Net-(C19-Pad1)" "Net-(C20-Pad1)" "VCAP_2_MEM" "VCAP_1_MEM" "Net-(R18-Pad1)"
-    "Net-(R19-Pad1)" "Net-(R26-Pad2)" "Net-(R30-Pad1)" PB6 PB9 "VCC_3V3" SWDRST mPHI2
-    mAUDIO SWDIO SWDCLK "Net-(R2-Pad1)" "Net-(R3-Pad1)" "Net-(R4-Pad1)" mCONF0 mCONF1
-    mCONF2 "mCS_512K" "mCS_1024K" mWE mOE
+    GND ~mEXSEL ~mD1XX ~mHALT ~mMPD ~mIRQ ~mRST ~mREF
+    ~mCCTL mA0 mA1 mA2 mA3 mA4 mA5 mA6
+    mA7 mA8 mA9 mA10 mA11 mA12 mA13 mA14
+    mA15 mR/~W ~mS4 mRD4 ~mS5 mRD5 mD0 mD1
+    mD2 mD3 mD4 mD5 mD6 mD7 "UART_RX" "UART_TX"
+    "LEDGRN_MEM" "Net-(BOOT0_MEM1-Pad1)" "Net-(BOOT1_MEM1-Pad1)" "VCAP_2_MEM" "VCAP_1_MEM" PB6 PB9 "VCC_3V3"
+    SWDRST mPHI2 mAUDIO SWDIO SWDCLK "Net-(R3-Pad1)" "Net-(R4-Pad1)" mCONF0
+    mCONF1 mCONF2 "Net-(C6-Pad1)" "Net-(C7-Pad1)" "Net-(C9-Pad2)" "Net-(D1-Pad2)" "Net-(R5-Pad1)" "Net-(R9-Pad1)"
+    "Net-(R10-Pad1)" "Net-(R11-Pad2)" "Net-(R13-Pad1)" "FSMC_A17" "FSMC_A15" "FSMC_A16" "FSMC_A18" "FSMC_A14"
+    "FSMC_NWE" "FSMC_A12" "FSMC_A13" "FSMC_A7" "FSMC_A8" "FSMC_A6" "FSMC_A9" "FSMC_A5"
+    "FSMC_A11" "FSMC_A4" "FSMC_NOE" "FSMC_A3" "FSMC_A10" "FSMC_A2" "FSMC_NE1" "FSMC_A1"
+    "FSMC_D7" "FSMC_A0" "FSMC_D6" "FSMC_D0" "FSMC_D5" "FSMC_D1" "FSMC_D4" "FSMC_D2"
+    "FSMC_D3" "FSMC_NE2"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
