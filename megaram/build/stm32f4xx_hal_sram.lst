@@ -1,0 +1,2075 @@
+ARM GAS  /tmp/ccFbrZXI.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"stm32f4xx_hal_sram.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.HAL_SRAM_DMA_XferCpltCallback,"ax",%progbits
+  18              		.align	1
+  19              		.weak	HAL_SRAM_DMA_XferCpltCallback
+  20              		.syntax unified
+  21              		.thumb
+  22              		.thumb_func
+  23              		.fpu fpv4-sp-d16
+  25              	HAL_SRAM_DMA_XferCpltCallback:
+  26              	.LFB134:
+  27              		.file 1 "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c"
+   1:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+   2:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ******************************************************************************
+   3:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @file    stm32f4xx_hal_sram.c
+   4:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @author  MCD Application Team
+   5:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief   SRAM HAL module driver.
+   6:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          This file provides a generic firmware to drive SRAM memories  
+   7:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          mounted as external device.
+   8:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *         
+   9:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   @verbatim
+  10:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+  11:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****                           ##### How to use this driver #####
+  12:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================  
+  13:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   [..]
+  14:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     This driver is a generic layered driver which contains a set of APIs used to 
+  15:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     control SRAM memories. It uses the FMC layer functions to interface 
+  16:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     with SRAM devices.  
+  17:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     The following sequence should be followed to configure the FMC/FSMC to interface
+  18:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     with SRAM/PSRAM memories: 
+  19:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       
+  20:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) Declare a SRAM_HandleTypeDef handle structure, for example:
+  21:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****           SRAM_HandleTypeDef  hsram; and: 
+  22:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****           
+  23:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (++) Fill the SRAM_HandleTypeDef handle "Init" field with the allowed 
+  24:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             values of the structure member.
+  25:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             
+  26:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (++) Fill the SRAM_HandleTypeDef handle "Instance" field with a predefined 
+  27:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             base register instance for NOR or SRAM device 
+  28:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****                          
+  29:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (++) Fill the SRAM_HandleTypeDef handle "Extended" field with a predefined
+  30:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             base register instance for NOR or SRAM extended mode 
+  31:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****              
+ARM GAS  /tmp/ccFbrZXI.s 			page 2
+
+
+  32:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) Declare two FMC_NORSRAM_TimingTypeDef structures, for both normal and extended 
+  33:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        mode timings; for example:
+  34:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****           FMC_NORSRAM_TimingTypeDef  Timing and FMC_NORSRAM_TimingTypeDef  ExTiming;
+  35:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       and fill its fields with the allowed values of the structure member.
+  36:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       
+  37:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) Initialize the SRAM Controller by calling the function HAL_SRAM_Init(). This function
+  38:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        performs the following sequence:
+  39:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****           
+  40:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (##) MSP hardware layer configuration using the function HAL_SRAM_MspInit()
+  41:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (##) Control register configuration using the FMC NORSRAM interface function 
+  42:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             FMC_NORSRAM_Init()
+  43:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (##) Timing register configuration using the FMC NORSRAM interface function 
+  44:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             FMC_NORSRAM_Timing_Init()
+  45:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (##) Extended mode Timing register configuration using the FMC NORSRAM interface function 
+  46:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             FMC_NORSRAM_Extended_Timing_Init()
+  47:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (##) Enable the SRAM device using the macro __FMC_NORSRAM_ENABLE()    
+  48:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  49:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) At this stage you can perform read/write accesses from/to the memory connected 
+  50:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        to the NOR/SRAM Bank. You can perform either polling or DMA transfer using the
+  51:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        following APIs:
+  52:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (++) HAL_SRAM_Read()/HAL_SRAM_Write() for polling read/write access
+  53:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        (++) HAL_SRAM_Read_DMA()/HAL_SRAM_Write_DMA() for DMA read/write transfer
+  54:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        
+  55:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) You can also control the SRAM device by calling the control APIs HAL_SRAM_WriteOperation_Ena
+  56:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        HAL_SRAM_WriteOperation_Disable() to respectively enable/disable the SRAM write operation  
+  57:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        
+  58:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    (#) You can continuously monitor the SRAM device HAL state by calling the function
+  59:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        HAL_SRAM_GetState()
+  60:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  61:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****        *** Callback registration ***
+  62:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     =============================================
+  63:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     [..]
+  64:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       The compilation define  USE_HAL_SRAM_REGISTER_CALLBACKS when set to 1
+  65:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       allows the user to configure dynamically the driver callbacks.
+  66:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  67:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       Use Functions @ref HAL_SRAM_RegisterCallback() to register a user callback,
+  68:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       it allows to register following callbacks:
+  69:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****         (+) MspInitCallback    : SRAM MspInit.
+  70:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****         (+) MspDeInitCallback  : SRAM MspDeInit.
+  71:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       This function takes as parameters the HAL peripheral handle, the Callback ID
+  72:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       and a pointer to the user callback function.
+  73:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  74:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       Use function @ref HAL_SRAM_UnRegisterCallback() to reset a callback to the default
+  75:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       weak (surcharged) function. It allows to reset following callbacks:
+  76:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****         (+) MspInitCallback    : SRAM MspInit.
+  77:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****         (+) MspDeInitCallback  : SRAM MspDeInit.
+  78:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       This function) takes as parameters the HAL peripheral handle and the Callback ID.
+  79:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  80:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       By default, after the @ref HAL_SRAM_Init and if the state is HAL_SRAM_STATE_RESET
+  81:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       all callbacks are reset to the corresponding legacy weak (surcharged) functions.
+  82:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       Exception done for MspInit and MspDeInit callbacks that are respectively
+  83:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       reset to the legacy weak (surcharged) functions in the @ref HAL_SRAM_Init
+  84:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       and @ref  HAL_SRAM_DeInit only when these callbacks are null (not registered beforehand).
+  85:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       If not, MspInit or MspDeInit are not null, the @ref HAL_SRAM_Init and @ref HAL_SRAM_DeInit
+  86:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       keep and use the user MspInit/MspDeInit callbacks (registered beforehand)
+  87:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  88:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       Callbacks can be registered/unregistered in READY state only.
+ARM GAS  /tmp/ccFbrZXI.s 			page 3
+
+
+  89:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       Exception done for MspInit/MspDeInit callbacks that can be registered/unregistered
+  90:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       in READY or RESET state, thus registered (user) MspInit/DeInit callbacks can be used
+  91:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       during the Init/DeInit.
+  92:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       In that case first register the MspInit/MspDeInit user callbacks
+  93:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       using @ref HAL_SRAM_RegisterCallback before calling @ref HAL_SRAM_DeInit
+  94:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       or @ref HAL_SRAM_Init function.
+  95:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  96:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       When The compilation define USE_HAL_SRAM_REGISTER_CALLBACKS is set to 0 or
+  97:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       not defined, the callback registering feature is not available
+  98:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       and weak (surcharged) callbacks are used.
+  99:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 100:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   @endverbatim
+ 101:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ******************************************************************************
+ 102:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @attention
+ 103:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *
+ 104:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+ 105:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * All rights reserved.</center></h2>
+ 106:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *
+ 107:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * This software component is licensed by ST under BSD 3-Clause license,
+ 108:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * the "License"; You may not use this file except in compliance with the
+ 109:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * License. You may obtain a copy of the License at:
+ 110:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                        opensource.org/licenses/BSD-3-Clause
+ 111:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *
+ 112:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ******************************************************************************
+ 113:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */ 
+ 114:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 115:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Includes ------------------------------------------------------------------*/
+ 116:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #include "stm32f4xx_hal.h"
+ 117:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 118:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @addtogroup STM32F4xx_HAL_Driver
+ 119:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 120:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 121:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 122:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM SRAM
+ 123:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief SRAM driver modules
+ 124:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 125:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 126:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #ifdef HAL_SRAM_MODULE_ENABLED
+ 127:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 128:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #if defined(STM32F405xx) || defined(STM32F415xx) || defined(STM32F407xx) || defined(STM32F417xx) ||
+ 129:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     defined(STM32F427xx) || defined(STM32F437xx) || defined(STM32F429xx) || defined(STM32F439xx) ||
+ 130:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     defined(STM32F446xx) || defined(STM32F469xx) || defined(STM32F479xx) || defined(STM32F412Zx) ||
+ 131:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     defined(STM32F412Vx) || defined(STM32F412Rx) || defined(STM32F413xx) || defined(STM32F423xx)
+ 132:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 133:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Private typedef -----------------------------------------------------------*/
+ 134:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Private define ------------------------------------------------------------*/
+ 135:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Private macro -------------------------------------------------------------*/    
+ 136:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Private variables ---------------------------------------------------------*/
+ 137:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Private functions ---------------------------------------------------------*/
+ 138:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 139:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /* Exported functions --------------------------------------------------------*/
+ 140:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM_Exported_Functions SRAM Exported Functions
+ 141:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 142:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 143:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM_Exported_Functions_Group1 Initialization and de-initialization functions 
+ 144:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief    Initialization and Configuration functions 
+ 145:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *
+ARM GAS  /tmp/ccFbrZXI.s 			page 4
+
+
+ 146:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   @verbatim    
+ 147:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 148:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****            ##### SRAM Initialization and de_initialization functions #####
+ 149:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 150:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     [..]  This section provides functions allowing to initialize/de-initialize
+ 151:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****           the SRAM memory
+ 152:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 153:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @endverbatim
+ 154:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 155:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 156:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 157:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 158:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Performs the SRAM device initialization sequence
+ 159:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 160:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 161:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  Timing Pointer to SRAM control timing structure 
+ 162:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  ExtTiming Pointer to SRAM extended mode timing structure  
+ 163:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 164:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 165:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Init(SRAM_HandleTypeDef *hsram, FMC_NORSRAM_TimingTypeDef *Timing, FMC_N
+ 166:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** { 
+ 167:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM handle parameter */
+ 168:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram == NULL)
+ 169:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 170:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****      return HAL_ERROR;
+ 171:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 172:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 173:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->State == HAL_SRAM_STATE_RESET)
+ 174:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {  
+ 175:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* Allocate lock resource and initialize it */
+ 176:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     hsram->Lock = HAL_UNLOCKED;
+ 177:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 178:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #if (USE_HAL_SRAM_REGISTER_CALLBACKS == 1)
+ 179:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     if(hsram->MspInitCallback == NULL)
+ 180:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     {
+ 181:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspInitCallback = HAL_SRAM_MspInit;
+ 182:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     }
+ 183:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     hsram->DmaXferCpltCallback = HAL_SRAM_DMA_XferCpltCallback;
+ 184:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     hsram->DmaXferErrorCallback = HAL_SRAM_DMA_XferErrorCallback;
+ 185:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 186:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* Init the low level hardware */
+ 187:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     hsram->MspInitCallback(hsram);
+ 188:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #else
+ 189:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* Initialize the low level hardware (MSP) */
+ 190:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     HAL_SRAM_MspInit(hsram);
+ 191:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #endif
+ 192:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 193:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 194:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Initialize SRAM control Interface */
+ 195:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_Init(hsram->Instance, &(hsram->Init));
+ 196:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 197:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Initialize SRAM timing Interface */
+ 198:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_Timing_Init(hsram->Instance, Timing, hsram->Init.NSBank); 
+ 199:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 200:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Initialize SRAM extended mode timing Interface */
+ 201:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_Extended_Timing_Init(hsram->Extended, ExtTiming, hsram->Init.NSBank,  hsram->Init.Ext
+ 202:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ARM GAS  /tmp/ccFbrZXI.s 			page 5
+
+
+ 203:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Enable the NORSRAM device */
+ 204:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __FMC_NORSRAM_ENABLE(hsram->Instance, hsram->Init.NSBank); 
+ 205:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 206:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;
+ 207:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 208:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 209:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 210:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Performs the SRAM device De-initialization sequence.
+ 211:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 212:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 213:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 214:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 215:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef  HAL_SRAM_DeInit(SRAM_HandleTypeDef *hsram)
+ 216:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** { 
+ 217:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #if (USE_HAL_SRAM_REGISTER_CALLBACKS == 1)
+ 218:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->MspDeInitCallback == NULL)
+ 219:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 220:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     hsram->MspDeInitCallback = HAL_SRAM_MspDeInit;
+ 221:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 222:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 223:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* DeInit the low level hardware */
+ 224:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->MspDeInitCallback(hsram);
+ 225:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #else
+ 226:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* De-Initialize the low level hardware (MSP) */
+ 227:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_SRAM_MspDeInit(hsram);
+ 228:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #endif
+ 229:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 230:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Configure the SRAM registers with their reset values */
+ 231:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_DeInit(hsram->Instance, hsram->Extended, hsram->Init.NSBank);
+ 232:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 233:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_RESET;
+ 234:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 235:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Release Lock */
+ 236:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 237:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 238:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;
+ 239:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 240:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 241:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 242:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  SRAM MSP Init.
+ 243:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 244:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 245:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval None
+ 246:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 247:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** __weak void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram)
+ 248:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 249:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+ 250:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   UNUSED(hsram);
+ 251:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* NOTE : This function Should not be modified, when the callback is needed,
+ 252:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             the HAL_SRAM_MspInit could be implemented in the user file
+ 253:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    */ 
+ 254:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 255:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 256:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 257:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  SRAM MSP DeInit.
+ 258:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 259:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ARM GAS  /tmp/ccFbrZXI.s 			page 6
+
+
+ 260:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval None
+ 261:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 262:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** __weak void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef *hsram)
+ 263:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 264:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+ 265:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   UNUSED(hsram);
+ 266:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* NOTE : This function Should not be modified, when the callback is needed,
+ 267:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             the HAL_SRAM_MspDeInit could be implemented in the user file
+ 268:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    */ 
+ 269:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 270:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 271:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 272:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  DMA transfer complete callback.
+ 273:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hdma pointer to a SRAM_HandleTypeDef structure that contains
+ 274:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 275:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval None
+ 276:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 277:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** __weak void HAL_SRAM_DMA_XferCpltCallback(DMA_HandleTypeDef *hdma)
+ 278:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+  28              		.loc 1 278 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+ 279:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+ 280:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   UNUSED(hdma);
+ 281:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* NOTE : This function Should not be modified, when the callback is needed,
+ 282:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             the HAL_SRAM_DMA_XferCpltCallback could be implemented in the user file
+ 283:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    */ 
+ 284:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+  34              		.loc 1 284 0
+  35 0000 7047     		bx	lr
+  36              		.cfi_endproc
+  37              	.LFE134:
+  39              		.section	.text.HAL_SRAM_DMA_XferErrorCallback,"ax",%progbits
+  40              		.align	1
+  41              		.weak	HAL_SRAM_DMA_XferErrorCallback
+  42              		.syntax unified
+  43              		.thumb
+  44              		.thumb_func
+  45              		.fpu fpv4-sp-d16
+  47              	HAL_SRAM_DMA_XferErrorCallback:
+  48              	.LFB135:
+ 285:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 286:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 287:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  DMA transfer complete error callback.
+ 288:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hdma pointer to a SRAM_HandleTypeDef structure that contains
+ 289:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 290:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval None
+ 291:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 292:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** __weak void HAL_SRAM_DMA_XferErrorCallback(DMA_HandleTypeDef *hdma)
+ 293:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+  49              		.loc 1 293 0
+  50              		.cfi_startproc
+  51              		@ args = 0, pretend = 0, frame = 0
+  52              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/ccFbrZXI.s 			page 7
+
+
+  53              		@ link register save eliminated.
+  54              	.LVL1:
+ 294:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+ 295:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   UNUSED(hdma);
+ 296:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* NOTE : This function Should not be modified, when the callback is needed,
+ 297:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****             the HAL_SRAM_DMA_XferErrorCallback could be implemented in the user file
+ 298:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****    */ 
+ 299:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+  55              		.loc 1 299 0
+  56 0000 7047     		bx	lr
+  57              		.cfi_endproc
+  58              	.LFE135:
+  60              		.section	.text.HAL_SRAM_MspInit,"ax",%progbits
+  61              		.align	1
+  62              		.weak	HAL_SRAM_MspInit
+  63              		.syntax unified
+  64              		.thumb
+  65              		.thumb_func
+  66              		.fpu fpv4-sp-d16
+  68              	HAL_SRAM_MspInit:
+  69              	.LFB132:
+ 248:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+  70              		.loc 1 248 0
+  71              		.cfi_startproc
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74              		@ link register save eliminated.
+  75              	.LVL2:
+ 254:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+  76              		.loc 1 254 0
+  77 0000 7047     		bx	lr
+  78              		.cfi_endproc
+  79              	.LFE132:
+  81              		.section	.text.HAL_SRAM_Init,"ax",%progbits
+  82              		.align	1
+  83              		.global	HAL_SRAM_Init
+  84              		.syntax unified
+  85              		.thumb
+  86              		.thumb_func
+  87              		.fpu fpv4-sp-d16
+  89              	HAL_SRAM_Init:
+  90              	.LFB130:
+ 166:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM handle parameter */
+  91              		.loc 1 166 0
+  92              		.cfi_startproc
+  93              		@ args = 0, pretend = 0, frame = 0
+  94              		@ frame_needed = 0, uses_anonymous_args = 0
+  95              	.LVL3:
+ 168:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+  96              		.loc 1 168 0
+  97 0000 28B3     		cbz	r0, .L7
+ 166:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM handle parameter */
+  98              		.loc 1 166 0
+  99 0002 70B5     		push	{r4, r5, r6, lr}
+ 100              	.LCFI0:
+ 101              		.cfi_def_cfa_offset 16
+ 102              		.cfi_offset 4, -16
+ARM GAS  /tmp/ccFbrZXI.s 			page 8
+
+
+ 103              		.cfi_offset 5, -12
+ 104              		.cfi_offset 6, -8
+ 105              		.cfi_offset 14, -4
+ 106 0004 0446     		mov	r4, r0
+ 107 0006 1546     		mov	r5, r2
+ 108 0008 0E46     		mov	r6, r1
+ 173:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {  
+ 109              		.loc 1 173 0
+ 110 000a 90F84930 		ldrb	r3, [r0, #73]	@ zero_extendqisi2
+ 111 000e CBB1     		cbz	r3, .L12
+ 112              	.LVL4:
+ 113              	.L6:
+ 195:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 114              		.loc 1 195 0
+ 115 0010 04F10801 		add	r1, r4, #8
+ 116 0014 2068     		ldr	r0, [r4]
+ 117 0016 FFF7FEFF 		bl	FSMC_NORSRAM_Init
+ 118              	.LVL5:
+ 198:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 119              		.loc 1 198 0
+ 120 001a A268     		ldr	r2, [r4, #8]
+ 121 001c 3146     		mov	r1, r6
+ 122 001e 2068     		ldr	r0, [r4]
+ 123 0020 FFF7FEFF 		bl	FSMC_NORSRAM_Timing_Init
+ 124              	.LVL6:
+ 201:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 125              		.loc 1 201 0
+ 126 0024 236B     		ldr	r3, [r4, #48]
+ 127 0026 A268     		ldr	r2, [r4, #8]
+ 128 0028 2946     		mov	r1, r5
+ 129 002a 6068     		ldr	r0, [r4, #4]
+ 130 002c FFF7FEFF 		bl	FSMC_NORSRAM_Extended_Timing_Init
+ 131              	.LVL7:
+ 204:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 132              		.loc 1 204 0
+ 133 0030 2268     		ldr	r2, [r4]
+ 134 0032 A168     		ldr	r1, [r4, #8]
+ 135 0034 52F82130 		ldr	r3, [r2, r1, lsl #2]
+ 136 0038 43F00103 		orr	r3, r3, #1
+ 137 003c 42F82130 		str	r3, [r2, r1, lsl #2]
+ 206:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 138              		.loc 1 206 0
+ 139 0040 0020     		movs	r0, #0
+ 207:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 140              		.loc 1 207 0
+ 141 0042 70BD     		pop	{r4, r5, r6, pc}
+ 142              	.LVL8:
+ 143              	.L12:
+ 176:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 144              		.loc 1 176 0
+ 145 0044 80F84830 		strb	r3, [r0, #72]
+ 190:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #endif
+ 146              		.loc 1 190 0
+ 147 0048 FFF7FEFF 		bl	HAL_SRAM_MspInit
+ 148              	.LVL9:
+ 149 004c E0E7     		b	.L6
+ 150              	.LVL10:
+ARM GAS  /tmp/ccFbrZXI.s 			page 9
+
+
+ 151              	.L7:
+ 152              	.LCFI1:
+ 153              		.cfi_def_cfa_offset 0
+ 154              		.cfi_restore 4
+ 155              		.cfi_restore 5
+ 156              		.cfi_restore 6
+ 157              		.cfi_restore 14
+ 170:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 158              		.loc 1 170 0
+ 159 004e 0120     		movs	r0, #1
+ 160              	.LVL11:
+ 207:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 161              		.loc 1 207 0
+ 162 0050 7047     		bx	lr
+ 163              		.cfi_endproc
+ 164              	.LFE130:
+ 166              		.section	.text.HAL_SRAM_MspDeInit,"ax",%progbits
+ 167              		.align	1
+ 168              		.weak	HAL_SRAM_MspDeInit
+ 169              		.syntax unified
+ 170              		.thumb
+ 171              		.thumb_func
+ 172              		.fpu fpv4-sp-d16
+ 174              	HAL_SRAM_MspDeInit:
+ 175              	.LFB133:
+ 263:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Prevent unused argument(s) compilation warning */
+ 176              		.loc 1 263 0
+ 177              		.cfi_startproc
+ 178              		@ args = 0, pretend = 0, frame = 0
+ 179              		@ frame_needed = 0, uses_anonymous_args = 0
+ 180              		@ link register save eliminated.
+ 181              	.LVL12:
+ 269:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 182              		.loc 1 269 0
+ 183 0000 7047     		bx	lr
+ 184              		.cfi_endproc
+ 185              	.LFE133:
+ 187              		.section	.text.HAL_SRAM_DeInit,"ax",%progbits
+ 188              		.align	1
+ 189              		.global	HAL_SRAM_DeInit
+ 190              		.syntax unified
+ 191              		.thumb
+ 192              		.thumb_func
+ 193              		.fpu fpv4-sp-d16
+ 195              	HAL_SRAM_DeInit:
+ 196              	.LFB131:
+ 216:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #if (USE_HAL_SRAM_REGISTER_CALLBACKS == 1)
+ 197              		.loc 1 216 0
+ 198              		.cfi_startproc
+ 199              		@ args = 0, pretend = 0, frame = 0
+ 200              		@ frame_needed = 0, uses_anonymous_args = 0
+ 201              	.LVL13:
+ 202 0000 10B5     		push	{r4, lr}
+ 203              	.LCFI2:
+ 204              		.cfi_def_cfa_offset 8
+ 205              		.cfi_offset 4, -8
+ 206              		.cfi_offset 14, -4
+ARM GAS  /tmp/ccFbrZXI.s 			page 10
+
+
+ 207 0002 0446     		mov	r4, r0
+ 227:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #endif
+ 208              		.loc 1 227 0
+ 209 0004 FFF7FEFF 		bl	HAL_SRAM_MspDeInit
+ 210              	.LVL14:
+ 231:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 211              		.loc 1 231 0
+ 212 0008 A268     		ldr	r2, [r4, #8]
+ 213 000a 6168     		ldr	r1, [r4, #4]
+ 214 000c 2068     		ldr	r0, [r4]
+ 215 000e FFF7FEFF 		bl	FSMC_NORSRAM_DeInit
+ 216              	.LVL15:
+ 233:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 217              		.loc 1 233 0
+ 218 0012 0020     		movs	r0, #0
+ 219 0014 84F84900 		strb	r0, [r4, #73]
+ 236:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 220              		.loc 1 236 0
+ 221 0018 84F84800 		strb	r0, [r4, #72]
+ 239:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 222              		.loc 1 239 0
+ 223 001c 10BD     		pop	{r4, pc}
+ 224              		.cfi_endproc
+ 225              	.LFE131:
+ 227              		.section	.text.HAL_SRAM_Read_8b,"ax",%progbits
+ 228              		.align	1
+ 229              		.global	HAL_SRAM_Read_8b
+ 230              		.syntax unified
+ 231              		.thumb
+ 232              		.thumb_func
+ 233              		.fpu fpv4-sp-d16
+ 235              	HAL_SRAM_Read_8b:
+ 236              	.LFB136:
+ 300:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 301:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 302:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @}
+ 303:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 304:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 305:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM_Exported_Functions_Group2 Input and Output functions 
+ 306:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief    Input Output and memory control functions 
+ 307:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *
+ 308:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   @verbatim    
+ 309:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 310:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****                   ##### SRAM Input and Output functions #####
+ 311:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 312:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   [..]  
+ 313:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     This section provides functions allowing to use and control the SRAM memory
+ 314:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 315:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @endverbatim
+ 316:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 317:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 318:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 319:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 320:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Reads 8-bit buffer from SRAM memory. 
+ 321:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 322:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 323:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to read start address
+ARM GAS  /tmp/ccFbrZXI.s 			page 11
+
+
+ 324:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pDstBuffer Pointer to destination buffer  
+ 325:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to read from memory
+ 326:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 327:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 328:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Read_8b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint8_t *pDstBuff
+ 329:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 237              		.loc 1 329 0
+ 238              		.cfi_startproc
+ 239              		@ args = 0, pretend = 0, frame = 0
+ 240              		@ frame_needed = 0, uses_anonymous_args = 0
+ 241              		@ link register save eliminated.
+ 242              	.LVL16:
+ 243 0000 10B4     		push	{r4}
+ 244              	.LCFI3:
+ 245              		.cfi_def_cfa_offset 4
+ 246              		.cfi_offset 4, -4
+ 247              	.LVL17:
+ 330:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __IO uint8_t * pSramAddress = (uint8_t *)pAddress;
+ 331:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 332:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 333:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 248              		.loc 1 333 0
+ 249 0002 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 250 0006 012C     		cmp	r4, #1
+ 251 0008 17D0     		beq	.L20
+ 252              		.loc 1 333 0 is_stmt 0 discriminator 2
+ 253 000a 0124     		movs	r4, #1
+ 254 000c 80F84840 		strb	r4, [r0, #72]
+ 334:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 335:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 336:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY;  
+ 255              		.loc 1 336 0 is_stmt 1 discriminator 2
+ 256 0010 0224     		movs	r4, #2
+ 257 0012 80F84940 		strb	r4, [r0, #73]
+ 337:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 338:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Read data from memory */
+ 339:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 258              		.loc 1 339 0 discriminator 2
+ 259 0016 04E0     		b	.L18
+ 260              	.LVL18:
+ 261              	.L19:
+ 340:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 341:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *pDstBuffer = *(__IO uint8_t *)pSramAddress;
+ 262              		.loc 1 341 0 discriminator 2
+ 263 0018 11F8014B 		ldrb	r4, [r1], #1	@ zero_extendqisi2
+ 264              	.LVL19:
+ 265 001c 02F8014B 		strb	r4, [r2], #1
+ 266              	.LVL20:
+ 339:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 267              		.loc 1 339 0 discriminator 2
+ 268 0020 013B     		subs	r3, r3, #1
+ 269              	.LVL21:
+ 270              	.L18:
+ 339:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 271              		.loc 1 339 0 is_stmt 0 discriminator 1
+ 272 0022 002B     		cmp	r3, #0
+ 273 0024 F8D1     		bne	.L19
+ARM GAS  /tmp/ccFbrZXI.s 			page 12
+
+
+ 342:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pDstBuffer++;
+ 343:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSramAddress++;
+ 344:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 345:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 346:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 347:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY;    
+ 274              		.loc 1 347 0 is_stmt 1
+ 275 0026 0123     		movs	r3, #1
+ 276              	.LVL22:
+ 277 0028 80F84930 		strb	r3, [r0, #73]
+ 348:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 349:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 350:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram); 
+ 278              		.loc 1 350 0
+ 279 002c 0023     		movs	r3, #0
+ 280 002e 80F84830 		strb	r3, [r0, #72]
+ 351:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 352:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;   
+ 281              		.loc 1 352 0
+ 282 0032 1846     		mov	r0, r3
+ 283              	.LVL23:
+ 284              	.L17:
+ 353:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 285              		.loc 1 353 0
+ 286 0034 5DF8044B 		ldr	r4, [sp], #4
+ 287              	.LCFI4:
+ 288              		.cfi_remember_state
+ 289              		.cfi_restore 4
+ 290              		.cfi_def_cfa_offset 0
+ 291 0038 7047     		bx	lr
+ 292              	.LVL24:
+ 293              	.L20:
+ 294              	.LCFI5:
+ 295              		.cfi_restore_state
+ 333:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 296              		.loc 1 333 0
+ 297 003a 0220     		movs	r0, #2
+ 298              	.LVL25:
+ 299 003c FAE7     		b	.L17
+ 300              		.cfi_endproc
+ 301              	.LFE136:
+ 303              		.section	.text.HAL_SRAM_Write_8b,"ax",%progbits
+ 304              		.align	1
+ 305              		.global	HAL_SRAM_Write_8b
+ 306              		.syntax unified
+ 307              		.thumb
+ 308              		.thumb_func
+ 309              		.fpu fpv4-sp-d16
+ 311              	HAL_SRAM_Write_8b:
+ 312              	.LFB137:
+ 354:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 355:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 356:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Writes 8-bit buffer to SRAM memory. 
+ 357:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 358:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 359:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to write start address
+ 360:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pSrcBuffer Pointer to source buffer to write  
+ARM GAS  /tmp/ccFbrZXI.s 			page 13
+
+
+ 361:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to write to memory
+ 362:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 363:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 364:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Write_8b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint8_t *pSrcBuf
+ 365:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 313              		.loc 1 365 0
+ 314              		.cfi_startproc
+ 315              		@ args = 0, pretend = 0, frame = 0
+ 316              		@ frame_needed = 0, uses_anonymous_args = 0
+ 317              		@ link register save eliminated.
+ 318              	.LVL26:
+ 319 0000 10B4     		push	{r4}
+ 320              	.LCFI6:
+ 321              		.cfi_def_cfa_offset 4
+ 322              		.cfi_offset 4, -4
+ 323              	.LVL27:
+ 366:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __IO uint8_t * pSramAddress = (uint8_t *)pAddress;
+ 367:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 368:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM controller state */
+ 369:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->State == HAL_SRAM_STATE_PROTECTED)
+ 324              		.loc 1 369 0
+ 325 0002 90F84940 		ldrb	r4, [r0, #73]	@ zero_extendqisi2
+ 326 0006 E4B2     		uxtb	r4, r4
+ 327 0008 042C     		cmp	r4, #4
+ 328 000a 1BD0     		beq	.L26
+ 370:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 371:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return  HAL_ERROR; 
+ 372:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 373:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 374:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 375:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 329              		.loc 1 375 0
+ 330 000c 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 331 0010 012C     		cmp	r4, #1
+ 332 0012 19D0     		beq	.L27
+ 333              		.loc 1 375 0 is_stmt 0 discriminator 2
+ 334 0014 0124     		movs	r4, #1
+ 335 0016 80F84840 		strb	r4, [r0, #72]
+ 376:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 377:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 378:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY; 
+ 336              		.loc 1 378 0 is_stmt 1 discriminator 2
+ 337 001a 0224     		movs	r4, #2
+ 338 001c 80F84940 		strb	r4, [r0, #73]
+ 379:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 380:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Write data to memory */
+ 381:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 339              		.loc 1 381 0 discriminator 2
+ 340 0020 04E0     		b	.L24
+ 341              	.LVL28:
+ 342              	.L25:
+ 382:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 383:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *(__IO uint8_t *)pSramAddress = *pSrcBuffer; 
+ 343              		.loc 1 383 0 discriminator 2
+ 344 0022 12F8014B 		ldrb	r4, [r2], #1	@ zero_extendqisi2
+ 345              	.LVL29:
+ 346 0026 01F8014B 		strb	r4, [r1], #1
+ARM GAS  /tmp/ccFbrZXI.s 			page 14
+
+
+ 347              	.LVL30:
+ 381:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 348              		.loc 1 381 0 discriminator 2
+ 349 002a 013B     		subs	r3, r3, #1
+ 350              	.LVL31:
+ 351              	.L24:
+ 381:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 352              		.loc 1 381 0 is_stmt 0 discriminator 1
+ 353 002c 002B     		cmp	r3, #0
+ 354 002e F8D1     		bne	.L25
+ 384:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSrcBuffer++;
+ 385:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSramAddress++;    
+ 386:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }    
+ 387:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 388:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 389:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY; 
+ 355              		.loc 1 389 0 is_stmt 1
+ 356 0030 0123     		movs	r3, #1
+ 357              	.LVL32:
+ 358 0032 80F84930 		strb	r3, [r0, #73]
+ 390:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 391:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 392:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 359              		.loc 1 392 0
+ 360 0036 0023     		movs	r3, #0
+ 361 0038 80F84830 		strb	r3, [r0, #72]
+ 393:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 394:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;   
+ 362              		.loc 1 394 0
+ 363 003c 1846     		mov	r0, r3
+ 364              	.LVL33:
+ 365              	.L23:
+ 395:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 366              		.loc 1 395 0
+ 367 003e 5DF8044B 		ldr	r4, [sp], #4
+ 368              	.LCFI7:
+ 369              		.cfi_remember_state
+ 370              		.cfi_restore 4
+ 371              		.cfi_def_cfa_offset 0
+ 372 0042 7047     		bx	lr
+ 373              	.LVL34:
+ 374              	.L26:
+ 375              	.LCFI8:
+ 376              		.cfi_restore_state
+ 371:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 377              		.loc 1 371 0
+ 378 0044 0120     		movs	r0, #1
+ 379              	.LVL35:
+ 380 0046 FAE7     		b	.L23
+ 381              	.LVL36:
+ 382              	.L27:
+ 375:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 383              		.loc 1 375 0
+ 384 0048 0220     		movs	r0, #2
+ 385              	.LVL37:
+ 386 004a F8E7     		b	.L23
+ 387              		.cfi_endproc
+ARM GAS  /tmp/ccFbrZXI.s 			page 15
+
+
+ 388              	.LFE137:
+ 390              		.section	.text.HAL_SRAM_Read_16b,"ax",%progbits
+ 391              		.align	1
+ 392              		.global	HAL_SRAM_Read_16b
+ 393              		.syntax unified
+ 394              		.thumb
+ 395              		.thumb_func
+ 396              		.fpu fpv4-sp-d16
+ 398              	HAL_SRAM_Read_16b:
+ 399              	.LFB138:
+ 396:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 397:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 398:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Reads 16-bit buffer from SRAM memory. 
+ 399:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 400:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 401:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to read start address
+ 402:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pDstBuffer Pointer to destination buffer  
+ 403:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to read from memory
+ 404:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 405:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 406:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Read_16b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint16_t *pDstBu
+ 407:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 400              		.loc 1 407 0
+ 401              		.cfi_startproc
+ 402              		@ args = 0, pretend = 0, frame = 0
+ 403              		@ frame_needed = 0, uses_anonymous_args = 0
+ 404              		@ link register save eliminated.
+ 405              	.LVL38:
+ 406 0000 10B4     		push	{r4}
+ 407              	.LCFI9:
+ 408              		.cfi_def_cfa_offset 4
+ 409              		.cfi_offset 4, -4
+ 410              	.LVL39:
+ 408:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __IO uint16_t * pSramAddress = (uint16_t *)pAddress;
+ 409:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 410:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 411:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 411              		.loc 1 411 0
+ 412 0002 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 413 0006 012C     		cmp	r4, #1
+ 414 0008 17D0     		beq	.L33
+ 415              		.loc 1 411 0 is_stmt 0 discriminator 2
+ 416 000a 0124     		movs	r4, #1
+ 417 000c 80F84840 		strb	r4, [r0, #72]
+ 412:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 413:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 414:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY;  
+ 418              		.loc 1 414 0 is_stmt 1 discriminator 2
+ 419 0010 0224     		movs	r4, #2
+ 420 0012 80F84940 		strb	r4, [r0, #73]
+ 415:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 416:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Read data from memory */
+ 417:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 421              		.loc 1 417 0 discriminator 2
+ 422 0016 04E0     		b	.L31
+ 423              	.LVL40:
+ 424              	.L32:
+ARM GAS  /tmp/ccFbrZXI.s 			page 16
+
+
+ 418:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 419:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *pDstBuffer = *(__IO uint16_t *)pSramAddress;
+ 425              		.loc 1 419 0 discriminator 2
+ 426 0018 31F8024B 		ldrh	r4, [r1], #2
+ 427              	.LVL41:
+ 428 001c 22F8024B 		strh	r4, [r2], #2	@ movhi
+ 429              	.LVL42:
+ 417:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 430              		.loc 1 417 0 discriminator 2
+ 431 0020 013B     		subs	r3, r3, #1
+ 432              	.LVL43:
+ 433              	.L31:
+ 417:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 434              		.loc 1 417 0 is_stmt 0 discriminator 1
+ 435 0022 002B     		cmp	r3, #0
+ 436 0024 F8D1     		bne	.L32
+ 420:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pDstBuffer++;
+ 421:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSramAddress++;
+ 422:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 423:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 424:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 425:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY;    
+ 437              		.loc 1 425 0 is_stmt 1
+ 438 0026 0123     		movs	r3, #1
+ 439              	.LVL44:
+ 440 0028 80F84930 		strb	r3, [r0, #73]
+ 426:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 427:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 428:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram); 
+ 441              		.loc 1 428 0
+ 442 002c 0023     		movs	r3, #0
+ 443 002e 80F84830 		strb	r3, [r0, #72]
+ 429:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 430:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;  
+ 444              		.loc 1 430 0
+ 445 0032 1846     		mov	r0, r3
+ 446              	.LVL45:
+ 447              	.L30:
+ 431:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 448              		.loc 1 431 0
+ 449 0034 5DF8044B 		ldr	r4, [sp], #4
+ 450              	.LCFI10:
+ 451              		.cfi_remember_state
+ 452              		.cfi_restore 4
+ 453              		.cfi_def_cfa_offset 0
+ 454 0038 7047     		bx	lr
+ 455              	.LVL46:
+ 456              	.L33:
+ 457              	.LCFI11:
+ 458              		.cfi_restore_state
+ 411:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 459              		.loc 1 411 0
+ 460 003a 0220     		movs	r0, #2
+ 461              	.LVL47:
+ 462 003c FAE7     		b	.L30
+ 463              		.cfi_endproc
+ 464              	.LFE138:
+ARM GAS  /tmp/ccFbrZXI.s 			page 17
+
+
+ 466              		.section	.text.HAL_SRAM_Write_16b,"ax",%progbits
+ 467              		.align	1
+ 468              		.global	HAL_SRAM_Write_16b
+ 469              		.syntax unified
+ 470              		.thumb
+ 471              		.thumb_func
+ 472              		.fpu fpv4-sp-d16
+ 474              	HAL_SRAM_Write_16b:
+ 475              	.LFB139:
+ 432:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 433:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 434:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Writes 16-bit buffer to SRAM memory. 
+ 435:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 436:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 437:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to write start address
+ 438:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pSrcBuffer Pointer to source buffer to write  
+ 439:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to write to memory
+ 440:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 441:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 442:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Write_16b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint16_t *pSrcB
+ 443:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 476              		.loc 1 443 0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 0
+ 479              		@ frame_needed = 0, uses_anonymous_args = 0
+ 480              		@ link register save eliminated.
+ 481              	.LVL48:
+ 482 0000 10B4     		push	{r4}
+ 483              	.LCFI12:
+ 484              		.cfi_def_cfa_offset 4
+ 485              		.cfi_offset 4, -4
+ 486              	.LVL49:
+ 444:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __IO uint16_t * pSramAddress = (uint16_t *)pAddress; 
+ 445:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 446:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM controller state */
+ 447:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->State == HAL_SRAM_STATE_PROTECTED)
+ 487              		.loc 1 447 0
+ 488 0002 90F84940 		ldrb	r4, [r0, #73]	@ zero_extendqisi2
+ 489 0006 E4B2     		uxtb	r4, r4
+ 490 0008 042C     		cmp	r4, #4
+ 491 000a 1BD0     		beq	.L39
+ 448:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 449:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return  HAL_ERROR; 
+ 450:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 451:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 452:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 453:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 492              		.loc 1 453 0
+ 493 000c 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 494 0010 012C     		cmp	r4, #1
+ 495 0012 19D0     		beq	.L40
+ 496              		.loc 1 453 0 is_stmt 0 discriminator 2
+ 497 0014 0124     		movs	r4, #1
+ 498 0016 80F84840 		strb	r4, [r0, #72]
+ 454:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 455:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 456:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY; 
+ARM GAS  /tmp/ccFbrZXI.s 			page 18
+
+
+ 499              		.loc 1 456 0 is_stmt 1 discriminator 2
+ 500 001a 0224     		movs	r4, #2
+ 501 001c 80F84940 		strb	r4, [r0, #73]
+ 457:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 458:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Write data to memory */
+ 459:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 502              		.loc 1 459 0 discriminator 2
+ 503 0020 04E0     		b	.L37
+ 504              	.LVL50:
+ 505              	.L38:
+ 460:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 461:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *(__IO uint16_t *)pSramAddress = *pSrcBuffer; 
+ 506              		.loc 1 461 0 discriminator 2
+ 507 0022 32F8024B 		ldrh	r4, [r2], #2
+ 508              	.LVL51:
+ 509 0026 21F8024B 		strh	r4, [r1], #2	@ movhi
+ 510              	.LVL52:
+ 459:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 511              		.loc 1 459 0 discriminator 2
+ 512 002a 013B     		subs	r3, r3, #1
+ 513              	.LVL53:
+ 514              	.L37:
+ 459:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 515              		.loc 1 459 0 is_stmt 0 discriminator 1
+ 516 002c 002B     		cmp	r3, #0
+ 517 002e F8D1     		bne	.L38
+ 462:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSrcBuffer++;
+ 463:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSramAddress++;    
+ 464:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }    
+ 465:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 466:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 467:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY; 
+ 518              		.loc 1 467 0 is_stmt 1
+ 519 0030 0123     		movs	r3, #1
+ 520              	.LVL54:
+ 521 0032 80F84930 		strb	r3, [r0, #73]
+ 468:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 469:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 470:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 522              		.loc 1 470 0
+ 523 0036 0023     		movs	r3, #0
+ 524 0038 80F84830 		strb	r3, [r0, #72]
+ 471:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 472:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;  
+ 525              		.loc 1 472 0
+ 526 003c 1846     		mov	r0, r3
+ 527              	.LVL55:
+ 528              	.L36:
+ 473:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 529              		.loc 1 473 0
+ 530 003e 5DF8044B 		ldr	r4, [sp], #4
+ 531              	.LCFI13:
+ 532              		.cfi_remember_state
+ 533              		.cfi_restore 4
+ 534              		.cfi_def_cfa_offset 0
+ 535 0042 7047     		bx	lr
+ 536              	.LVL56:
+ARM GAS  /tmp/ccFbrZXI.s 			page 19
+
+
+ 537              	.L39:
+ 538              	.LCFI14:
+ 539              		.cfi_restore_state
+ 449:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 540              		.loc 1 449 0
+ 541 0044 0120     		movs	r0, #1
+ 542              	.LVL57:
+ 543 0046 FAE7     		b	.L36
+ 544              	.LVL58:
+ 545              	.L40:
+ 453:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 546              		.loc 1 453 0
+ 547 0048 0220     		movs	r0, #2
+ 548              	.LVL59:
+ 549 004a F8E7     		b	.L36
+ 550              		.cfi_endproc
+ 551              	.LFE139:
+ 553              		.section	.text.HAL_SRAM_Read_32b,"ax",%progbits
+ 554              		.align	1
+ 555              		.global	HAL_SRAM_Read_32b
+ 556              		.syntax unified
+ 557              		.thumb
+ 558              		.thumb_func
+ 559              		.fpu fpv4-sp-d16
+ 561              	HAL_SRAM_Read_32b:
+ 562              	.LFB140:
+ 474:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 475:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 476:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Reads 32-bit buffer from SRAM memory. 
+ 477:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 478:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 479:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to read start address
+ 480:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pDstBuffer Pointer to destination buffer  
+ 481:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to read from memory
+ 482:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 483:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 484:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Read_32b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint32_t *pDstBu
+ 485:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 563              		.loc 1 485 0
+ 564              		.cfi_startproc
+ 565              		@ args = 0, pretend = 0, frame = 0
+ 566              		@ frame_needed = 0, uses_anonymous_args = 0
+ 567              		@ link register save eliminated.
+ 568              	.LVL60:
+ 569 0000 10B4     		push	{r4}
+ 570              	.LCFI15:
+ 571              		.cfi_def_cfa_offset 4
+ 572              		.cfi_offset 4, -4
+ 486:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 487:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 573              		.loc 1 487 0
+ 574 0002 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 575 0006 012C     		cmp	r4, #1
+ 576 0008 17D0     		beq	.L46
+ 577              		.loc 1 487 0 is_stmt 0 discriminator 2
+ 578 000a 0124     		movs	r4, #1
+ 579 000c 80F84840 		strb	r4, [r0, #72]
+ARM GAS  /tmp/ccFbrZXI.s 			page 20
+
+
+ 488:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 489:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 490:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY;  
+ 580              		.loc 1 490 0 is_stmt 1 discriminator 2
+ 581 0010 0224     		movs	r4, #2
+ 582 0012 80F84940 		strb	r4, [r0, #73]
+ 491:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 492:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Read data from memory */
+ 493:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 583              		.loc 1 493 0 discriminator 2
+ 584 0016 04E0     		b	.L44
+ 585              	.L45:
+ 494:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 495:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *pDstBuffer = *(__IO uint32_t *)pAddress;
+ 586              		.loc 1 495 0 discriminator 2
+ 587 0018 51F8044B 		ldr	r4, [r1], #4
+ 588              	.LVL61:
+ 589 001c 42F8044B 		str	r4, [r2], #4
+ 590              	.LVL62:
+ 493:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 591              		.loc 1 493 0 discriminator 2
+ 592 0020 013B     		subs	r3, r3, #1
+ 593              	.LVL63:
+ 594              	.L44:
+ 493:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 595              		.loc 1 493 0 is_stmt 0 discriminator 1
+ 596 0022 002B     		cmp	r3, #0
+ 597 0024 F8D1     		bne	.L45
+ 496:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pDstBuffer++;
+ 497:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pAddress++;
+ 498:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 499:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 500:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 501:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY;    
+ 598              		.loc 1 501 0 is_stmt 1
+ 599 0026 0123     		movs	r3, #1
+ 600              	.LVL64:
+ 601 0028 80F84930 		strb	r3, [r0, #73]
+ 502:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 503:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 504:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram); 
+ 602              		.loc 1 504 0
+ 603 002c 0023     		movs	r3, #0
+ 604 002e 80F84830 		strb	r3, [r0, #72]
+ 505:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 506:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;  
+ 605              		.loc 1 506 0
+ 606 0032 1846     		mov	r0, r3
+ 607              	.LVL65:
+ 608              	.L43:
+ 507:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 609              		.loc 1 507 0
+ 610 0034 5DF8044B 		ldr	r4, [sp], #4
+ 611              	.LCFI16:
+ 612              		.cfi_remember_state
+ 613              		.cfi_restore 4
+ 614              		.cfi_def_cfa_offset 0
+ARM GAS  /tmp/ccFbrZXI.s 			page 21
+
+
+ 615 0038 7047     		bx	lr
+ 616              	.LVL66:
+ 617              	.L46:
+ 618              	.LCFI17:
+ 619              		.cfi_restore_state
+ 487:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 620              		.loc 1 487 0
+ 621 003a 0220     		movs	r0, #2
+ 622              	.LVL67:
+ 623 003c FAE7     		b	.L43
+ 624              		.cfi_endproc
+ 625              	.LFE140:
+ 627              		.section	.text.HAL_SRAM_Write_32b,"ax",%progbits
+ 628              		.align	1
+ 629              		.global	HAL_SRAM_Write_32b
+ 630              		.syntax unified
+ 631              		.thumb
+ 632              		.thumb_func
+ 633              		.fpu fpv4-sp-d16
+ 635              	HAL_SRAM_Write_32b:
+ 636              	.LFB141:
+ 508:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 509:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 510:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Writes 32-bit buffer to SRAM memory. 
+ 511:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 512:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 513:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to write start address
+ 514:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pSrcBuffer Pointer to source buffer to write  
+ 515:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to write to memory
+ 516:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 517:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 518:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Write_32b(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint32_t *pSrcB
+ 519:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 637              		.loc 1 519 0
+ 638              		.cfi_startproc
+ 639              		@ args = 0, pretend = 0, frame = 0
+ 640              		@ frame_needed = 0, uses_anonymous_args = 0
+ 641              		@ link register save eliminated.
+ 642              	.LVL68:
+ 643 0000 10B4     		push	{r4}
+ 644              	.LCFI18:
+ 645              		.cfi_def_cfa_offset 4
+ 646              		.cfi_offset 4, -4
+ 520:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM controller state */
+ 521:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->State == HAL_SRAM_STATE_PROTECTED)
+ 647              		.loc 1 521 0
+ 648 0002 90F84940 		ldrb	r4, [r0, #73]	@ zero_extendqisi2
+ 649 0006 E4B2     		uxtb	r4, r4
+ 650 0008 042C     		cmp	r4, #4
+ 651 000a 1BD0     		beq	.L52
+ 522:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 523:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return  HAL_ERROR; 
+ 524:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 525:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 526:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 527:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 652              		.loc 1 527 0
+ARM GAS  /tmp/ccFbrZXI.s 			page 22
+
+
+ 653 000c 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 654 0010 012C     		cmp	r4, #1
+ 655 0012 19D0     		beq	.L53
+ 656              		.loc 1 527 0 is_stmt 0 discriminator 2
+ 657 0014 0124     		movs	r4, #1
+ 658 0016 80F84840 		strb	r4, [r0, #72]
+ 528:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 529:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 530:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY; 
+ 659              		.loc 1 530 0 is_stmt 1 discriminator 2
+ 660 001a 0224     		movs	r4, #2
+ 661 001c 80F84940 		strb	r4, [r0, #73]
+ 531:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 532:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Write data to memory */
+ 533:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   for(; BufferSize != 0U; BufferSize--)
+ 662              		.loc 1 533 0 discriminator 2
+ 663 0020 04E0     		b	.L50
+ 664              	.L51:
+ 534:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 535:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     *(__IO uint32_t *)pAddress = *pSrcBuffer; 
+ 665              		.loc 1 535 0 discriminator 2
+ 666 0022 52F8044B 		ldr	r4, [r2], #4
+ 667              	.LVL69:
+ 668 0026 41F8044B 		str	r4, [r1], #4
+ 669              	.LVL70:
+ 533:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 670              		.loc 1 533 0 discriminator 2
+ 671 002a 013B     		subs	r3, r3, #1
+ 672              	.LVL71:
+ 673              	.L50:
+ 533:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 674              		.loc 1 533 0 is_stmt 0 discriminator 1
+ 675 002c 002B     		cmp	r3, #0
+ 676 002e F8D1     		bne	.L51
+ 536:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pSrcBuffer++;
+ 537:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     pAddress++;    
+ 538:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }    
+ 539:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 540:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 541:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY; 
+ 677              		.loc 1 541 0 is_stmt 1
+ 678 0030 0123     		movs	r3, #1
+ 679              	.LVL72:
+ 680 0032 80F84930 		strb	r3, [r0, #73]
+ 542:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 543:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 544:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 681              		.loc 1 544 0
+ 682 0036 0023     		movs	r3, #0
+ 683 0038 80F84830 		strb	r3, [r0, #72]
+ 545:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 546:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;   
+ 684              		.loc 1 546 0
+ 685 003c 1846     		mov	r0, r3
+ 686              	.LVL73:
+ 687              	.L49:
+ 547:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ARM GAS  /tmp/ccFbrZXI.s 			page 23
+
+
+ 688              		.loc 1 547 0
+ 689 003e 5DF8044B 		ldr	r4, [sp], #4
+ 690              	.LCFI19:
+ 691              		.cfi_remember_state
+ 692              		.cfi_restore 4
+ 693              		.cfi_def_cfa_offset 0
+ 694 0042 7047     		bx	lr
+ 695              	.LVL74:
+ 696              	.L52:
+ 697              	.LCFI20:
+ 698              		.cfi_restore_state
+ 523:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 699              		.loc 1 523 0
+ 700 0044 0120     		movs	r0, #1
+ 701              	.LVL75:
+ 702 0046 FAE7     		b	.L49
+ 703              	.LVL76:
+ 704              	.L53:
+ 527:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 705              		.loc 1 527 0
+ 706 0048 0220     		movs	r0, #2
+ 707              	.LVL77:
+ 708 004a F8E7     		b	.L49
+ 709              		.cfi_endproc
+ 710              	.LFE141:
+ 712              		.section	.text.HAL_SRAM_Read_DMA,"ax",%progbits
+ 713              		.align	1
+ 714              		.global	HAL_SRAM_Read_DMA
+ 715              		.syntax unified
+ 716              		.thumb
+ 717              		.thumb_func
+ 718              		.fpu fpv4-sp-d16
+ 720              	HAL_SRAM_Read_DMA:
+ 721              	.LFB142:
+ 548:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 549:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 550:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Reads a Words data from the SRAM memory using DMA transfer.
+ 551:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 552:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 553:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to read start address
+ 554:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pDstBuffer Pointer to destination buffer  
+ 555:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to read from memory
+ 556:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 557:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 558:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Read_DMA(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint32_t *pDstBu
+ 559:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 722              		.loc 1 559 0
+ 723              		.cfi_startproc
+ 724              		@ args = 0, pretend = 0, frame = 0
+ 725              		@ frame_needed = 0, uses_anonymous_args = 0
+ 726              	.LVL78:
+ 727 0000 70B5     		push	{r4, r5, r6, lr}
+ 728              	.LCFI21:
+ 729              		.cfi_def_cfa_offset 16
+ 730              		.cfi_offset 4, -16
+ 731              		.cfi_offset 5, -12
+ 732              		.cfi_offset 6, -8
+ARM GAS  /tmp/ccFbrZXI.s 			page 24
+
+
+ 733              		.cfi_offset 14, -4
+ 560:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 561:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);  
+ 734              		.loc 1 561 0
+ 735 0002 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 736 0006 012C     		cmp	r4, #1
+ 737 0008 15D0     		beq	.L57
+ 738 000a 0446     		mov	r4, r0
+ 739              		.loc 1 561 0 is_stmt 0 discriminator 2
+ 740 000c 0125     		movs	r5, #1
+ 741 000e 80F84850 		strb	r5, [r0, #72]
+ 562:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 563:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 564:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY;   
+ 742              		.loc 1 564 0 is_stmt 1 discriminator 2
+ 743 0012 0220     		movs	r0, #2
+ 744              	.LVL79:
+ 745 0014 84F84900 		strb	r0, [r4, #73]
+ 565:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 566:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Configure DMA user callbacks */
+ 567:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->hdma->XferCpltCallback  = HAL_SRAM_DMA_XferCpltCallback;
+ 746              		.loc 1 567 0 discriminator 2
+ 747 0018 E06C     		ldr	r0, [r4, #76]
+ 748 001a 084E     		ldr	r6, .L59
+ 749 001c C663     		str	r6, [r0, #60]
+ 568:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->hdma->XferErrorCallback = HAL_SRAM_DMA_XferErrorCallback;
+ 750              		.loc 1 568 0 discriminator 2
+ 751 001e E06C     		ldr	r0, [r4, #76]
+ 752 0020 074E     		ldr	r6, .L59+4
+ 753 0022 C664     		str	r6, [r0, #76]
+ 569:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 570:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Enable the DMA Stream */
+ 571:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_DMA_Start_IT(hsram->hdma, (uint32_t)pAddress, (uint32_t)pDstBuffer, (uint32_t)BufferSize);
+ 754              		.loc 1 571 0 discriminator 2
+ 755 0024 E06C     		ldr	r0, [r4, #76]
+ 756 0026 FFF7FEFF 		bl	HAL_DMA_Start_IT
+ 757              	.LVL80:
+ 572:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 573:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 574:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY; 
+ 758              		.loc 1 574 0 discriminator 2
+ 759 002a 84F84950 		strb	r5, [r4, #73]
+ 575:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 576:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 577:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);  
+ 760              		.loc 1 577 0 discriminator 2
+ 761 002e 0020     		movs	r0, #0
+ 762 0030 84F84800 		strb	r0, [r4, #72]
+ 763              	.LVL81:
+ 764              	.L56:
+ 578:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 579:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK; 
+ 580:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 765              		.loc 1 580 0
+ 766 0034 70BD     		pop	{r4, r5, r6, pc}
+ 767              	.LVL82:
+ 768              	.L57:
+ARM GAS  /tmp/ccFbrZXI.s 			page 25
+
+
+ 561:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 769              		.loc 1 561 0
+ 770 0036 0220     		movs	r0, #2
+ 771              	.LVL83:
+ 772 0038 FCE7     		b	.L56
+ 773              	.L60:
+ 774 003a 00BF     		.align	2
+ 775              	.L59:
+ 776 003c 00000000 		.word	HAL_SRAM_DMA_XferCpltCallback
+ 777 0040 00000000 		.word	HAL_SRAM_DMA_XferErrorCallback
+ 778              		.cfi_endproc
+ 779              	.LFE142:
+ 781              		.section	.text.HAL_SRAM_Write_DMA,"ax",%progbits
+ 782              		.align	1
+ 783              		.global	HAL_SRAM_Write_DMA
+ 784              		.syntax unified
+ 785              		.thumb
+ 786              		.thumb_func
+ 787              		.fpu fpv4-sp-d16
+ 789              	HAL_SRAM_Write_DMA:
+ 790              	.LFB143:
+ 581:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 582:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 583:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Writes a Words data buffer to SRAM memory using DMA transfer.
+ 584:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 585:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 586:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pAddress Pointer to write start address
+ 587:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  pSrcBuffer Pointer to source buffer to write  
+ 588:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  BufferSize Size of the buffer to write to memory
+ 589:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 590:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 591:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_Write_DMA(SRAM_HandleTypeDef *hsram, uint32_t *pAddress, uint32_t *pSrcB
+ 592:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 791              		.loc 1 592 0
+ 792              		.cfi_startproc
+ 793              		@ args = 0, pretend = 0, frame = 0
+ 794              		@ frame_needed = 0, uses_anonymous_args = 0
+ 795              	.LVL84:
+ 796 0000 70B5     		push	{r4, r5, r6, lr}
+ 797              	.LCFI22:
+ 798              		.cfi_def_cfa_offset 16
+ 799              		.cfi_offset 4, -16
+ 800              		.cfi_offset 5, -12
+ 801              		.cfi_offset 6, -8
+ 802              		.cfi_offset 14, -4
+ 593:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Check the SRAM controller state */
+ 594:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(hsram->State == HAL_SRAM_STATE_PROTECTED)
+ 803              		.loc 1 594 0
+ 804 0002 90F84950 		ldrb	r5, [r0, #73]	@ zero_extendqisi2
+ 805 0006 EDB2     		uxtb	r5, r5
+ 806 0008 042D     		cmp	r5, #4
+ 807 000a 1CD0     		beq	.L63
+ 595:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 596:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return  HAL_ERROR; 
+ 597:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 598:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 599:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ARM GAS  /tmp/ccFbrZXI.s 			page 26
+
+
+ 600:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 808              		.loc 1 600 0
+ 809 000c 90F84840 		ldrb	r4, [r0, #72]	@ zero_extendqisi2
+ 810 0010 012C     		cmp	r4, #1
+ 811 0012 1AD0     		beq	.L64
+ 812 0014 1546     		mov	r5, r2
+ 813 0016 0A46     		mov	r2, r1
+ 814              	.LVL85:
+ 815 0018 0446     		mov	r4, r0
+ 816              		.loc 1 600 0 is_stmt 0 discriminator 2
+ 817 001a 0126     		movs	r6, #1
+ 818 001c 80F84860 		strb	r6, [r0, #72]
+ 601:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 602:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 603:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY; 
+ 819              		.loc 1 603 0 is_stmt 1 discriminator 2
+ 820 0020 0221     		movs	r1, #2
+ 821              	.LVL86:
+ 822 0022 80F84910 		strb	r1, [r0, #73]
+ 604:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 605:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Configure DMA user callbacks */
+ 606:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->hdma->XferCpltCallback  = HAL_SRAM_DMA_XferCpltCallback;
+ 823              		.loc 1 606 0 discriminator 2
+ 824 0026 C16C     		ldr	r1, [r0, #76]
+ 825 0028 0948     		ldr	r0, .L66
+ 826              	.LVL87:
+ 827 002a C863     		str	r0, [r1, #60]
+ 607:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->hdma->XferErrorCallback = HAL_SRAM_DMA_XferErrorCallback;
+ 828              		.loc 1 607 0 discriminator 2
+ 829 002c E16C     		ldr	r1, [r4, #76]
+ 830 002e 0948     		ldr	r0, .L66+4
+ 831 0030 C864     		str	r0, [r1, #76]
+ 608:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 609:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Enable the DMA Stream */
+ 610:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_DMA_Start_IT(hsram->hdma, (uint32_t)pSrcBuffer, (uint32_t)pAddress, (uint32_t)BufferSize);
+ 832              		.loc 1 610 0 discriminator 2
+ 833 0032 2946     		mov	r1, r5
+ 834 0034 E06C     		ldr	r0, [r4, #76]
+ 835 0036 FFF7FEFF 		bl	HAL_DMA_Start_IT
+ 836              	.LVL88:
+ 611:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 612:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 613:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY;  
+ 837              		.loc 1 613 0 discriminator 2
+ 838 003a 84F84960 		strb	r6, [r4, #73]
+ 614:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 615:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 616:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);  
+ 839              		.loc 1 616 0 discriminator 2
+ 840 003e 0020     		movs	r0, #0
+ 841 0040 84F84800 		strb	r0, [r4, #72]
+ 842              	.LVL89:
+ 843              	.L62:
+ 617:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 618:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;
+ 619:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 844              		.loc 1 619 0
+ARM GAS  /tmp/ccFbrZXI.s 			page 27
+
+
+ 845 0044 70BD     		pop	{r4, r5, r6, pc}
+ 846              	.LVL90:
+ 847              	.L63:
+ 596:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 848              		.loc 1 596 0
+ 849 0046 0120     		movs	r0, #1
+ 850              	.LVL91:
+ 851 0048 FCE7     		b	.L62
+ 852              	.LVL92:
+ 853              	.L64:
+ 600:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 854              		.loc 1 600 0
+ 855 004a 0220     		movs	r0, #2
+ 856              	.LVL93:
+ 857 004c FAE7     		b	.L62
+ 858              	.L67:
+ 859 004e 00BF     		.align	2
+ 860              	.L66:
+ 861 0050 00000000 		.word	HAL_SRAM_DMA_XferCpltCallback
+ 862 0054 00000000 		.word	HAL_SRAM_DMA_XferErrorCallback
+ 863              		.cfi_endproc
+ 864              	.LFE143:
+ 866              		.section	.text.HAL_SRAM_WriteOperation_Enable,"ax",%progbits
+ 867              		.align	1
+ 868              		.global	HAL_SRAM_WriteOperation_Enable
+ 869              		.syntax unified
+ 870              		.thumb
+ 871              		.thumb_func
+ 872              		.fpu fpv4-sp-d16
+ 874              	HAL_SRAM_WriteOperation_Enable:
+ 875              	.LFB144:
+ 620:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 621:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #if (USE_HAL_SRAM_REGISTER_CALLBACKS == 1)
+ 622:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 623:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Register a User SRAM Callback
+ 624:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *         To be used instead of the weak (surcharged) predefined callback
+ 625:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param hsram : SRAM handle
+ 626:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param CallbackId : ID of the callback to be registered
+ 627:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *        This parameter can be one of the following values:
+ 628:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_MSP_INIT_CB_ID       SRAM MspInit callback ID
+ 629:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_MSP_DEINIT_CB_ID     SRAM MspDeInit callback ID
+ 630:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param pCallback : pointer to the Callback function
+ 631:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval status
+ 632:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 633:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_RegisterCallback (SRAM_HandleTypeDef *hsram, HAL_SRAM_CallbackIDTypeDef 
+ 634:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 635:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 636:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_SRAM_StateTypeDef state;
+ 637:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 638:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(pCallback == NULL)
+ 639:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 640:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return HAL_ERROR;
+ 641:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 642:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 643:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process locked */
+ 644:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 645:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ARM GAS  /tmp/ccFbrZXI.s 			page 28
+
+
+ 646:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   state = hsram->State;
+ 647:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if((state == HAL_SRAM_STATE_READY) || (state == HAL_SRAM_STATE_RESET) || (state == HAL_SRAM_STATE
+ 648:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 649:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     switch (CallbackId)
+ 650:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     {
+ 651:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_INIT_CB_ID :
+ 652:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspInitCallback = pCallback;
+ 653:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 654:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_DEINIT_CB_ID :
+ 655:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspDeInitCallback = pCallback;
+ 656:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 657:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     default :
+ 658:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       /* update return status */
+ 659:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       status =  HAL_ERROR;
+ 660:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 661:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     }
+ 662:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 663:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   else
+ 664:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 665:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* update return status */
+ 666:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     status =  HAL_ERROR;
+ 667:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 668:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 669:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Release Lock */
+ 670:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 671:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return status;
+ 672:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 673:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 674:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 675:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Unregister a User SRAM Callback
+ 676:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *         SRAM Callback is redirected to the weak (surcharged) predefined callback
+ 677:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param hsram : SRAM handle
+ 678:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param CallbackId : ID of the callback to be unregistered
+ 679:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *        This parameter can be one of the following values:
+ 680:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_MSP_INIT_CB_ID       SRAM MspInit callback ID
+ 681:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_MSP_DEINIT_CB_ID     SRAM MspDeInit callback ID
+ 682:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_DMA_XFER_CPLT_CB_ID  SRAM DMA Xfer Complete callback ID
+ 683:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_DMA_XFER_ERR_CB_ID   SRAM DMA Xfer Error callback ID
+ 684:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval status
+ 685:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 686:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_UnRegisterCallback (SRAM_HandleTypeDef *hsram, HAL_SRAM_CallbackIDTypeDe
+ 687:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 688:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 689:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_SRAM_StateTypeDef state;
+ 690:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 691:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process locked */
+ 692:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 693:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 694:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   state = hsram->State;
+ 695:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if((state == HAL_SRAM_STATE_READY) || (state == HAL_SRAM_STATE_PROTECTED))
+ 696:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 697:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     switch (CallbackId)
+ 698:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     {
+ 699:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_INIT_CB_ID :
+ 700:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspInitCallback = HAL_SRAM_MspInit;
+ 701:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 702:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_DEINIT_CB_ID :
+ARM GAS  /tmp/ccFbrZXI.s 			page 29
+
+
+ 703:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspDeInitCallback = HAL_SRAM_MspDeInit;
+ 704:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 705:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_DMA_XFER_CPLT_CB_ID :
+ 706:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->DmaXferCpltCallback = HAL_SRAM_DMA_XferCpltCallback;
+ 707:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 708:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_DMA_XFER_ERR_CB_ID :
+ 709:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->DmaXferErrorCallback = HAL_SRAM_DMA_XferErrorCallback;
+ 710:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 711:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     default :
+ 712:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       /* update return status */
+ 713:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       status =  HAL_ERROR;
+ 714:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 715:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     }
+ 716:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 717:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   else if(state == HAL_SRAM_STATE_RESET)
+ 718:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 719:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     switch (CallbackId)
+ 720:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     {
+ 721:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_INIT_CB_ID :
+ 722:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspInitCallback = HAL_SRAM_MspInit;
+ 723:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 724:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_MSP_DEINIT_CB_ID :
+ 725:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->MspDeInitCallback = HAL_SRAM_MspDeInit;
+ 726:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 727:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     default :
+ 728:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       /* update return status */
+ 729:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       status =  HAL_ERROR;
+ 730:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 731:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     }
+ 732:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 733:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   else
+ 734:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 735:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* update return status */
+ 736:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     status =  HAL_ERROR;
+ 737:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 738:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 739:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Release Lock */
+ 740:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 741:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return status;
+ 742:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 743:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 744:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 745:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Register a User SRAM Callback for DMA transfers
+ 746:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *         To be used instead of the weak (surcharged) predefined callback
+ 747:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param hsram : SRAM handle
+ 748:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param CallbackId : ID of the callback to be registered
+ 749:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *        This parameter can be one of the following values:
+ 750:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_DMA_XFER_CPLT_CB_ID  SRAM DMA Xfer Complete callback ID
+ 751:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *          @arg @ref HAL_SRAM_DMA_XFER_ERR_CB_ID   SRAM DMA Xfer Error callback ID
+ 752:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param pCallback : pointer to the Callback function
+ 753:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval status
+ 754:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 755:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_RegisterDmaCallback(SRAM_HandleTypeDef *hsram, HAL_SRAM_CallbackIDTypeDe
+ 756:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 757:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_StatusTypeDef status = HAL_OK;
+ 758:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   HAL_SRAM_StateTypeDef state;
+ 759:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ARM GAS  /tmp/ccFbrZXI.s 			page 30
+
+
+ 760:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if(pCallback == NULL)
+ 761:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 762:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     return HAL_ERROR;
+ 763:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 764:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 765:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process locked */
+ 766:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 767:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 768:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   state = hsram->State;
+ 769:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   if((state == HAL_SRAM_STATE_READY) || (state == HAL_SRAM_STATE_PROTECTED))
+ 770:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 771:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     switch (CallbackId)
+ 772:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     {
+ 773:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_DMA_XFER_CPLT_CB_ID :
+ 774:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->DmaXferCpltCallback = pCallback;
+ 775:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 776:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     case HAL_SRAM_DMA_XFER_ERR_CB_ID :
+ 777:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       hsram->DmaXferErrorCallback = pCallback;
+ 778:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 779:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     default :
+ 780:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       /* update return status */
+ 781:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       status =  HAL_ERROR;
+ 782:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****       break;
+ 783:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     }
+ 784:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 785:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   else
+ 786:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   {
+ 787:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     /* update return status */
+ 788:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     status =  HAL_ERROR;
+ 789:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   }
+ 790:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 791:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Release Lock */
+ 792:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram);
+ 793:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return status;
+ 794:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 795:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** #endif
+ 796:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 797:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @}
+ 798:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 799:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 800:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM_Exported_Functions_Group3 Control functions 
+ 801:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****  *  @brief   management functions 
+ 802:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****  *
+ 803:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @verbatim   
+ 804:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 805:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****                         ##### SRAM Control functions #####
+ 806:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================  
+ 807:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   [..]
+ 808:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     This subsection provides a set of functions allowing to control dynamically
+ 809:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     the SRAM interface.
+ 810:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 811:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @endverbatim
+ 812:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 813:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 814:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 815:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 816:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Enables dynamically SRAM write operation.
+ARM GAS  /tmp/ccFbrZXI.s 			page 31
+
+
+ 817:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 818:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 819:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 820:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 821:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_WriteOperation_Enable(SRAM_HandleTypeDef *hsram)
+ 822:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 876              		.loc 1 822 0
+ 877              		.cfi_startproc
+ 878              		@ args = 0, pretend = 0, frame = 0
+ 879              		@ frame_needed = 0, uses_anonymous_args = 0
+ 880              	.LVL94:
+ 881 0000 38B5     		push	{r3, r4, r5, lr}
+ 882              	.LCFI23:
+ 883              		.cfi_def_cfa_offset 16
+ 884              		.cfi_offset 3, -16
+ 885              		.cfi_offset 4, -12
+ 886              		.cfi_offset 5, -8
+ 887              		.cfi_offset 14, -4
+ 823:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 824:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 888              		.loc 1 824 0
+ 889 0002 90F84830 		ldrb	r3, [r0, #72]	@ zero_extendqisi2
+ 890 0006 012B     		cmp	r3, #1
+ 891 0008 0DD0     		beq	.L70
+ 892 000a 0446     		mov	r4, r0
+ 893              		.loc 1 824 0 is_stmt 0 discriminator 2
+ 894 000c 0125     		movs	r5, #1
+ 895 000e 80F84850 		strb	r5, [r0, #72]
+ 825:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 826:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Enable write operation */
+ 827:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_WriteOperation_Enable(hsram->Instance, hsram->Init.NSBank); 
+ 896              		.loc 1 827 0 is_stmt 1 discriminator 2
+ 897 0012 8168     		ldr	r1, [r0, #8]
+ 898 0014 0068     		ldr	r0, [r0]
+ 899              	.LVL95:
+ 900 0016 FFF7FEFF 		bl	FSMC_NORSRAM_WriteOperation_Enable
+ 901              	.LVL96:
+ 828:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 829:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 830:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_READY;
+ 902              		.loc 1 830 0 discriminator 2
+ 903 001a 84F84950 		strb	r5, [r4, #73]
+ 831:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 832:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 833:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram); 
+ 904              		.loc 1 833 0 discriminator 2
+ 905 001e 0020     		movs	r0, #0
+ 906 0020 84F84800 		strb	r0, [r4, #72]
+ 907              	.LVL97:
+ 908              	.L69:
+ 834:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 835:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;  
+ 836:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 909              		.loc 1 836 0
+ 910 0024 38BD     		pop	{r3, r4, r5, pc}
+ 911              	.LVL98:
+ 912              	.L70:
+ARM GAS  /tmp/ccFbrZXI.s 			page 32
+
+
+ 824:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 913              		.loc 1 824 0
+ 914 0026 0220     		movs	r0, #2
+ 915              	.LVL99:
+ 916 0028 FCE7     		b	.L69
+ 917              		.cfi_endproc
+ 918              	.LFE144:
+ 920              		.section	.text.HAL_SRAM_WriteOperation_Disable,"ax",%progbits
+ 921              		.align	1
+ 922              		.global	HAL_SRAM_WriteOperation_Disable
+ 923              		.syntax unified
+ 924              		.thumb
+ 925              		.thumb_func
+ 926              		.fpu fpv4-sp-d16
+ 928              	HAL_SRAM_WriteOperation_Disable:
+ 929              	.LFB145:
+ 837:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 838:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 839:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Disables dynamically SRAM write operation.
+ 840:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 841:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 842:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL status
+ 843:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 844:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_StatusTypeDef HAL_SRAM_WriteOperation_Disable(SRAM_HandleTypeDef *hsram)
+ 845:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 930              		.loc 1 845 0
+ 931              		.cfi_startproc
+ 932              		@ args = 0, pretend = 0, frame = 0
+ 933              		@ frame_needed = 0, uses_anonymous_args = 0
+ 934              	.LVL100:
+ 846:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 847:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_LOCK(hsram);
+ 935              		.loc 1 847 0
+ 936 0000 90F84830 		ldrb	r3, [r0, #72]	@ zero_extendqisi2
+ 937 0004 012B     		cmp	r3, #1
+ 938 0006 12D0     		beq	.L74
+ 845:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process Locked */
+ 939              		.loc 1 845 0 discriminator 2
+ 940 0008 10B5     		push	{r4, lr}
+ 941              	.LCFI24:
+ 942              		.cfi_def_cfa_offset 8
+ 943              		.cfi_offset 4, -8
+ 944              		.cfi_offset 14, -4
+ 945 000a 0446     		mov	r4, r0
+ 946              		.loc 1 847 0 discriminator 2
+ 947 000c 0123     		movs	r3, #1
+ 948 000e 80F84830 		strb	r3, [r0, #72]
+ 848:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 849:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 850:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_BUSY;
+ 949              		.loc 1 850 0 discriminator 2
+ 950 0012 0223     		movs	r3, #2
+ 951 0014 80F84930 		strb	r3, [r0, #73]
+ 851:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     
+ 852:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Disable write operation */
+ 853:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   FMC_NORSRAM_WriteOperation_Disable(hsram->Instance, hsram->Init.NSBank); 
+ 952              		.loc 1 853 0 discriminator 2
+ARM GAS  /tmp/ccFbrZXI.s 			page 33
+
+
+ 953 0018 8168     		ldr	r1, [r0, #8]
+ 954 001a 0068     		ldr	r0, [r0]
+ 955              	.LVL101:
+ 956 001c FFF7FEFF 		bl	FSMC_NORSRAM_WriteOperation_Disable
+ 957              	.LVL102:
+ 854:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 855:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Update the SRAM controller state */
+ 856:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   hsram->State = HAL_SRAM_STATE_PROTECTED;
+ 958              		.loc 1 856 0 discriminator 2
+ 959 0020 0423     		movs	r3, #4
+ 960 0022 84F84930 		strb	r3, [r4, #73]
+ 857:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 858:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   /* Process unlocked */
+ 859:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   __HAL_UNLOCK(hsram); 
+ 961              		.loc 1 859 0 discriminator 2
+ 962 0026 0020     		movs	r0, #0
+ 963 0028 84F84800 		strb	r0, [r4, #72]
+ 860:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 861:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return HAL_OK;  
+ 862:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 964              		.loc 1 862 0 discriminator 2
+ 965 002c 10BD     		pop	{r4, pc}
+ 966              	.LVL103:
+ 967              	.L74:
+ 968              	.LCFI25:
+ 969              		.cfi_def_cfa_offset 0
+ 970              		.cfi_restore 4
+ 971              		.cfi_restore 14
+ 847:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 972              		.loc 1 847 0
+ 973 002e 0220     		movs	r0, #2
+ 974              	.LVL104:
+ 975              		.loc 1 862 0
+ 976 0030 7047     		bx	lr
+ 977              		.cfi_endproc
+ 978              	.LFE145:
+ 980              		.section	.text.HAL_SRAM_GetState,"ax",%progbits
+ 981              		.align	1
+ 982              		.global	HAL_SRAM_GetState
+ 983              		.syntax unified
+ 984              		.thumb
+ 985              		.thumb_func
+ 986              		.fpu fpv4-sp-d16
+ 988              	HAL_SRAM_GetState:
+ 989              	.LFB146:
+ 863:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 864:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 865:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @}
+ 866:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 867:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 868:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /** @defgroup SRAM_Exported_Functions_Group4 State functions 
+ 869:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****  *  @brief   Peripheral State functions 
+ 870:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****  *
+ 871:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @verbatim   
+ 872:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================
+ 873:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****                       ##### SRAM State functions #####
+ 874:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   ==============================================================================  
+ARM GAS  /tmp/ccFbrZXI.s 			page 34
+
+
+ 875:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   [..]
+ 876:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     This subsection permits to get in run-time the status of the SRAM controller 
+ 877:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****     and the data flow.
+ 878:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** 
+ 879:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** @endverbatim
+ 880:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @{
+ 881:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 882:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   
+ 883:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** /**
+ 884:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @brief  Returns the SRAM controller state
+ 885:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @param  hsram pointer to a SRAM_HandleTypeDef structure that contains
+ 886:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   *                the configuration information for SRAM module.
+ 887:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   * @retval HAL state
+ 888:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   */
+ 889:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** HAL_SRAM_StateTypeDef HAL_SRAM_GetState(SRAM_HandleTypeDef *hsram)
+ 890:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** {
+ 990              		.loc 1 890 0
+ 991              		.cfi_startproc
+ 992              		@ args = 0, pretend = 0, frame = 0
+ 993              		@ frame_needed = 0, uses_anonymous_args = 0
+ 994              		@ link register save eliminated.
+ 995              	.LVL105:
+ 891:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c ****   return hsram->State;
+ 996              		.loc 1 891 0
+ 997 0000 90F84900 		ldrb	r0, [r0, #73]	@ zero_extendqisi2
+ 998              	.LVL106:
+ 892:Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c **** }
+ 999              		.loc 1 892 0
+ 1000 0004 7047     		bx	lr
+ 1001              		.cfi_endproc
+ 1002              	.LFE146:
+ 1004              		.text
+ 1005              	.Letext0:
+ 1006              		.file 2 "/home/gianluca/gcc-arm-none-eabi-7-2018-q2-update/arm-none-eabi/include/machine/_default_
+ 1007              		.file 3 "/home/gianluca/gcc-arm-none-eabi-7-2018-q2-update/arm-none-eabi/include/sys/_stdint.h"
+ 1008              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 1009              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h"
+ 1010              		.file 6 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1011              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1012              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1013              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_fsmc.h"
+ 1014              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_sram.h"
+ARM GAS  /tmp/ccFbrZXI.s 			page 35
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 stm32f4xx_hal_sram.c
+     /tmp/ccFbrZXI.s:18     .text.HAL_SRAM_DMA_XferCpltCallback:0000000000000000 $t
+     /tmp/ccFbrZXI.s:25     .text.HAL_SRAM_DMA_XferCpltCallback:0000000000000000 HAL_SRAM_DMA_XferCpltCallback
+     /tmp/ccFbrZXI.s:40     .text.HAL_SRAM_DMA_XferErrorCallback:0000000000000000 $t
+     /tmp/ccFbrZXI.s:47     .text.HAL_SRAM_DMA_XferErrorCallback:0000000000000000 HAL_SRAM_DMA_XferErrorCallback
+     /tmp/ccFbrZXI.s:61     .text.HAL_SRAM_MspInit:0000000000000000 $t
+     /tmp/ccFbrZXI.s:68     .text.HAL_SRAM_MspInit:0000000000000000 HAL_SRAM_MspInit
+     /tmp/ccFbrZXI.s:82     .text.HAL_SRAM_Init:0000000000000000 $t
+     /tmp/ccFbrZXI.s:89     .text.HAL_SRAM_Init:0000000000000000 HAL_SRAM_Init
+     /tmp/ccFbrZXI.s:167    .text.HAL_SRAM_MspDeInit:0000000000000000 $t
+     /tmp/ccFbrZXI.s:174    .text.HAL_SRAM_MspDeInit:0000000000000000 HAL_SRAM_MspDeInit
+     /tmp/ccFbrZXI.s:188    .text.HAL_SRAM_DeInit:0000000000000000 $t
+     /tmp/ccFbrZXI.s:195    .text.HAL_SRAM_DeInit:0000000000000000 HAL_SRAM_DeInit
+     /tmp/ccFbrZXI.s:228    .text.HAL_SRAM_Read_8b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:235    .text.HAL_SRAM_Read_8b:0000000000000000 HAL_SRAM_Read_8b
+     /tmp/ccFbrZXI.s:304    .text.HAL_SRAM_Write_8b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:311    .text.HAL_SRAM_Write_8b:0000000000000000 HAL_SRAM_Write_8b
+     /tmp/ccFbrZXI.s:391    .text.HAL_SRAM_Read_16b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:398    .text.HAL_SRAM_Read_16b:0000000000000000 HAL_SRAM_Read_16b
+     /tmp/ccFbrZXI.s:467    .text.HAL_SRAM_Write_16b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:474    .text.HAL_SRAM_Write_16b:0000000000000000 HAL_SRAM_Write_16b
+     /tmp/ccFbrZXI.s:554    .text.HAL_SRAM_Read_32b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:561    .text.HAL_SRAM_Read_32b:0000000000000000 HAL_SRAM_Read_32b
+     /tmp/ccFbrZXI.s:628    .text.HAL_SRAM_Write_32b:0000000000000000 $t
+     /tmp/ccFbrZXI.s:635    .text.HAL_SRAM_Write_32b:0000000000000000 HAL_SRAM_Write_32b
+     /tmp/ccFbrZXI.s:713    .text.HAL_SRAM_Read_DMA:0000000000000000 $t
+     /tmp/ccFbrZXI.s:720    .text.HAL_SRAM_Read_DMA:0000000000000000 HAL_SRAM_Read_DMA
+     /tmp/ccFbrZXI.s:776    .text.HAL_SRAM_Read_DMA:000000000000003c $d
+     /tmp/ccFbrZXI.s:782    .text.HAL_SRAM_Write_DMA:0000000000000000 $t
+     /tmp/ccFbrZXI.s:789    .text.HAL_SRAM_Write_DMA:0000000000000000 HAL_SRAM_Write_DMA
+     /tmp/ccFbrZXI.s:861    .text.HAL_SRAM_Write_DMA:0000000000000050 $d
+     /tmp/ccFbrZXI.s:867    .text.HAL_SRAM_WriteOperation_Enable:0000000000000000 $t
+     /tmp/ccFbrZXI.s:874    .text.HAL_SRAM_WriteOperation_Enable:0000000000000000 HAL_SRAM_WriteOperation_Enable
+     /tmp/ccFbrZXI.s:921    .text.HAL_SRAM_WriteOperation_Disable:0000000000000000 $t
+     /tmp/ccFbrZXI.s:928    .text.HAL_SRAM_WriteOperation_Disable:0000000000000000 HAL_SRAM_WriteOperation_Disable
+     /tmp/ccFbrZXI.s:981    .text.HAL_SRAM_GetState:0000000000000000 $t
+     /tmp/ccFbrZXI.s:988    .text.HAL_SRAM_GetState:0000000000000000 HAL_SRAM_GetState
+
+UNDEFINED SYMBOLS
+FSMC_NORSRAM_Init
+FSMC_NORSRAM_Timing_Init
+FSMC_NORSRAM_Extended_Timing_Init
+FSMC_NORSRAM_DeInit
+HAL_DMA_Start_IT
+FSMC_NORSRAM_WriteOperation_Enable
+FSMC_NORSRAM_WriteOperation_Disable
