@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file      startup_stm32f407xx.s
+  * @file      startup_stm32f429xx.s
   * @author    MCD Application Team
-  * @brief     STM32F407xx Devices vector table for GCC based toolchains. 
+  * @brief     STM32F429xx Devices vector table for GCC based toolchains. 
   *            This module performs:
   *                - Set the initial SP
   *                - Set the initial PC == Reset_Handler,
@@ -74,9 +74,9 @@ defined in linker script */
     .section  .text.Reset_Handler
   .weak  Reset_Handler
   .type  Reset_Handler, %function
-Reset_Handler:  
-  ldr   sp, =_estack     /* set stack pointer */
-
+Reset_Handler: 
+  ldr   sp, =_estack       /* set stack pointer */
+ 
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -136,11 +136,11 @@ Infinite_Loop:
    .section  .isr_vector,"a",%progbits
   .type  g_pfnVectors, %object
   .size  g_pfnVectors, .-g_pfnVectors
-    
-    
+   
 g_pfnVectors:
   .word  _estack
   .word  Reset_Handler
+
   .word  NMI_Handler
   .word  HardFault_Handler
   .word  MemManage_Handler
@@ -205,7 +205,7 @@ g_pfnVectors:
   .word     TIM8_TRG_COM_TIM14_IRQHandler     /* TIM8 Trigger and Commutation and TIM14 */
   .word     TIM8_CC_IRQHandler                /* TIM8 Capture Compare         */                          
   .word     DMA1_Stream7_IRQHandler           /* DMA1 Stream7                 */                          
-  .word     FSMC_IRQHandler                   /* FSMC                         */                   
+  .word     FMC_IRQHandler                    /* FMC                         */                   
   .word     SDIO_IRQHandler                   /* SDIO                         */                   
   .word     TIM5_IRQHandler                   /* TIM5                         */                   
   .word     SPI3_IRQHandler                   /* SPI3                         */                   
@@ -236,11 +236,19 @@ g_pfnVectors:
   .word     OTG_HS_WKUP_IRQHandler            /* USB OTG HS Wakeup through EXTI */                         
   .word     OTG_HS_IRQHandler                 /* USB OTG HS                   */                   
   .word     DCMI_IRQHandler                   /* DCMI                         */                   
-  .word     0                                 /* CRYP crypto                  */                   
+  .word     0                                 /* Reserved                     */                   
   .word     HASH_RNG_IRQHandler               /* Hash and Rng                 */
   .word     FPU_IRQHandler                    /* FPU                          */
-                         
-                         
+  .word     UART7_IRQHandler                  /* UART7                        */      
+  .word     UART8_IRQHandler                  /* UART8                        */
+  .word     SPI4_IRQHandler                   /* SPI4                         */
+  .word     SPI5_IRQHandler                   /* SPI5 						  */
+  .word     SPI6_IRQHandler                   /* SPI6						  */
+  .word     SAI1_IRQHandler                   /* SAI1						  */
+  .word     LTDC_IRQHandler                   /* LTDC_IRQHandler			  */
+  .word     LTDC_ER_IRQHandler                /* LTDC_ER_IRQHandler			  */
+  .word     DMA2D_IRQHandler                  /* DMA2D                        */
+  
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the Default_Handler. 
@@ -352,7 +360,7 @@ g_pfnVectors:
             
    .weak      TIM1_UP_TIM10_IRQHandler            
    .thumb_set TIM1_UP_TIM10_IRQHandler,Default_Handler
-      
+
    .weak      TIM1_TRG_COM_TIM11_IRQHandler      
    .thumb_set TIM1_TRG_COM_TIM11_IRQHandler,Default_Handler
       
@@ -419,8 +427,8 @@ g_pfnVectors:
    .weak      DMA1_Stream7_IRQHandler               
    .thumb_set DMA1_Stream7_IRQHandler,Default_Handler
                      
-   .weak      FSMC_IRQHandler            
-   .thumb_set FSMC_IRQHandler,Default_Handler
+   .weak      FMC_IRQHandler            
+   .thumb_set FMC_IRQHandler,Default_Handler
                      
    .weak      SDIO_IRQHandler            
    .thumb_set SDIO_IRQHandler,Default_Handler
@@ -457,13 +465,13 @@ g_pfnVectors:
             
    .weak      DMA2_Stream4_IRQHandler               
    .thumb_set DMA2_Stream4_IRQHandler,Default_Handler
-            
-   .weak      ETH_IRQHandler      
+   
+   .weak      ETH_IRQHandler               
    .thumb_set ETH_IRQHandler,Default_Handler
-                  
-   .weak      ETH_WKUP_IRQHandler                  
+
+   .weak      ETH_WKUP_IRQHandler               
    .thumb_set ETH_WKUP_IRQHandler,Default_Handler
-            
+
    .weak      CAN2_TX_IRQHandler   
    .thumb_set CAN2_TX_IRQHandler,Default_Handler
                            
@@ -518,4 +526,34 @@ g_pfnVectors:
    .weak      FPU_IRQHandler                  
    .thumb_set FPU_IRQHandler,Default_Handler  
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+   .weak      UART7_IRQHandler            
+   .thumb_set UART7_IRQHandler,Default_Handler
+
+   .weak      UART8_IRQHandler            
+   .thumb_set UART8_IRQHandler,Default_Handler
+
+   .weak      SPI4_IRQHandler            
+   .thumb_set SPI4_IRQHandler,Default_Handler
+
+   .weak      SPI5_IRQHandler            
+   .thumb_set SPI5_IRQHandler,Default_Handler
+
+   .weak      SPI6_IRQHandler            
+   .thumb_set SPI6_IRQHandler,Default_Handler
+
+   .weak      SAI1_IRQHandler            
+   .thumb_set SAI1_IRQHandler,Default_Handler
+
+   .weak      LTDC_IRQHandler            
+   .thumb_set LTDC_IRQHandler,Default_Handler
+
+   .weak      LTDC_ER_IRQHandler            
+   .thumb_set LTDC_ER_IRQHandler,Default_Handler
+
+   .weak      DMA2D_IRQHandler            
+   .thumb_set DMA2D_IRQHandler,Default_Handler
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/		
+ 
+   
+   

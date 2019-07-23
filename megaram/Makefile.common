@@ -1,0 +1,58 @@
+# Makefile.common
+
+######################################
+# building variables
+######################################
+# debug build?
+DEBUG = 0
+
+ifeq ($(DEBUG), 1)
+	OPT =
+else
+	# optimization level
+	#OPTLVL = -O2
+	OPTLVL = -O3
+	OPT = $(OPTLVL) -fomit-frame-pointer -funroll-loops
+endif
+
+BUILD_DIR = build
+
+#########################################
+# LIBRARIES NEEDED FOR THIS APPLICATION #
+#########################################
+
+# C_SOURCES
+C_SOURCES += \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_gpio.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sram.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usart.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_dma.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_rcc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_utils.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_exti.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
+	Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
+
+
+# C_INCLUDES
+C_INCLUDES += \
+	-IDrivers/STM32F4xx_HAL_Driver/Inc \
+	-IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
+	-IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
+	-IDrivers/CMSIS/Include \
+
+#### EOF
