@@ -33,14 +33,14 @@
 #include "main.h"
 
 typedef enum {
-    EXPANSION_TYPE_130XE = 0,       /* 0 0 0 */
-    EXPANSION_TYPE_192K_COMPYSHOP,  /* 0 0 1 */
-    EXPANSION_TYPE_320K_RAMBO,      /* 0 1 0 */
-    EXPANSION_TYPE_320K_COMPYSHOP,  /* 0 1 1 */
-    EXPANSION_TYPE_576K_MOD,        /* 1 0 0 */
-    EXPANSION_TYPE_1088K_MOD,       /* 1 0 1 */
-                                    /* 1 1 0 */
-                                    /* 1 1 1 */
+    EXPANSION_TYPE_130XE = 0,      
+    EXPANSION_TYPE_192K,           
+    EXPANSION_TYPE_256K_RAMBO,     
+    EXPANSION_TYPE_320K,           
+    EXPANSION_TYPE_320K_COMPYSHOP, 
+    EXPANSION_TYPE_576K_MOD,       
+    EXPANSION_TYPE_576K_COMPYSHOP,
+    EXPANSION_TYPE_1088K_MOD,
     EXPANSION_TYPE_NONE,            // LAST
 } t_expansion;
 
@@ -392,9 +392,14 @@ static void banner(t_expansion type)
 			PDEBUG("130XE 128K EXPANSION\r\n");
 			PDEBUG(ANSI_RESET);
 			break;
-		case EXPANSION_TYPE_192K_COMPYSHOP:
+		case EXPANSION_TYPE_192K:
 			PDEBUG(ANSI_BLUE);
-			PDEBUG("192K COMPYSHOP EXPANSION\r\n");
+			PDEBUG("192K (COMPYSHOP) EXPANSION\r\n");
+			PDEBUG(ANSI_RESET);
+			break;
+		case EXPANSION_TYPE_256K_RAMBO:
+			PDEBUG(ANSI_BLUE);
+			PDEBUG("256K RAMBO EXPANSION\r\n");
 			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_320K_COMPYSHOP:
@@ -402,9 +407,9 @@ static void banner(t_expansion type)
 			PDEBUG("320K COMPYSHOP EXPANSION\r\n");
 			PDEBUG(ANSI_RESET);
 			break;
-		case EXPANSION_TYPE_320K_RAMBO:
+		case EXPANSION_TYPE_320K:
 			PDEBUG(ANSI_BLUE);
-			PDEBUG("320K RAMBO EXPANSION\r\n");
+			PDEBUG("320K (RAMBO) EXPANSION\r\n");
 			PDEBUG(ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_576K_MOD:
@@ -577,15 +582,32 @@ int main(void)
 
 						/* Good! We can access our AtariMegaRAM EXPANSION! */
 						GREEN_LED_ON;
+						/**
+							7  6  5  4  3  2  1  0
+							----------------------
+							Bank bits:
+							128K:		bits 2, 3             (0x0c) >> 2
+							192K:		bits 2, 3, 6          (0x4c) ((0x40) >> 2 + (0x0c)) >> 2
+							256K Rambo:	bits 2, 3, 5, 6 -- bits 3 and 2 must be LSBs for main memory aliasing (0x6c) ((0x60 >> 5) + (0x0c))
+							320K:		bits 2, 3, 5, 6       (0x6c) ((0x60) >> 1 + (0x0c)) >> 2
+							320K COMPY:	bits 2, 3, 6, 7       (0xcc) ((0xc0) >> 2 + (0x0c)) >> 2
+							576K:		bits 1, 2, 3, 5, 6    (0x6e) ((0x60) >> 1 + (0x0e)) >> 1
+							576K COMPY:	bits 1, 2, 3, 6, 7    (0xce) ((0xc0) >> 2 + (0x0e)) >> 1
+							1088K:		bits 1, 2, 3, 5, 6, 7 (0xee) ((0xe0) >> 1 + (0x0e)) >> 1
+
+						**/
 
 						/* Calculate which bankno has to be accessed, depending
 						 * on emulation of expansion type */
 						switch (EMULATION_TYPE)
 						{
-							case EXPANSION_TYPE_192K_COMPYSHOP:
+							case EXPANSION_TYPE_192K:
 								bank = (((PORTB & 0x0c) + ((PORTB & 0x40) >> 2)) >> 2);
 								break;
-							case EXPANSION_TYPE_320K_RAMBO:
+							case EXPANSION_TYPE_256K_RAMBO:
+								bank = (((PORTB & 0x60) >> 5) + (PORTB & 0x0c));
+								break;
+							case EXPANSION_TYPE_320K:
 								bank = (((PORTB & 0x0c) + ((PORTB & 0x60) >> 1)) >> 2);
 								break;
 							case EXPANSION_TYPE_320K_COMPYSHOP:
@@ -593,6 +615,9 @@ int main(void)
 								break;
 							case EXPANSION_TYPE_576K_MOD:
 								bank = (((PORTB & 0x0e) + ((PORTB & 0x60) >> 1)) >> 1);
+								break;
+							case EXPANSION_TYPE_576K_COMPYSHOP:
+								bank = (((PORTB & 0x0e) + ((PORTB & 0xc0) >> 2)) >> 1);
 								break;
 							case EXPANSION_TYPE_1088K_MOD:
 								bank = (((PORTB & 0x0e) + ((PORTB & 0xe0) >> 1)) >> 1);
