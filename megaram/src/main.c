@@ -439,7 +439,7 @@ static void banner(t_expansion type)
   * 
   * This software intercept the memory access to PORTB to configure
   * the bank scheme with a compatible mode, enables the external memory
-  * only if the BIT 2 of the PBCTL is cleared.
+  * only if the BIT 2 of the PBCTL is set.
   * 
   * Every access here disable the internal RAM with the EXSEL signal (low)
   * 
@@ -532,6 +532,17 @@ int main(void)
 				INTERNAL_RAM_ENABLE;
 				break;
 
+				/* From warerat (from atariage's forum):
+				 * 
+				 * Be aware for external PIA emulation, you must not only
+				 * save the data destined for $D301. You must also intercept
+				 * and save writes to PBCTL $D303 bit 2 to enable writing to
+				 * $D301 *only* when PBCTL bit 2 = 1.
+				 * This further qualifies writes to the output register
+				 * at $D301 (which is what you see externally on the PIA),
+				 * not the data direction register at $D301 as there are
+				 * two registers at the same location.
+				 */
 			case 0xD301: /* PORTB Emulation */
 				// ATARI CPU Needs to WRITE Data?
 				INTERNAL_RAM_DISABLE;
@@ -542,7 +553,13 @@ int main(void)
 					// read the data bus on falling edge of phi2
 					while (CONTROL_IN & PHI2)
 						data = DATA_IN;
-					PORTB = data;
+					/*
+					 * Save internally the PORTB data only if it is intended
+					 * as memory banked selection register and not if
+					 * it is used as data direction control of the PIA PORTB
+					 */
+					if (PBCTL & (1 << 2))
+						PORTB = data;
 				}
 				else
 				{
