@@ -614,8 +614,13 @@ int main(void)
 						while (CONTROL_IN & PHI2)
 							data = DATA_IN;
 						EMULATION_TYPE = data;
+						GREEN_LED_ON;
 						ATARI_RESET_ASSERT;
+						banner(EMULATION_TYPE);
+						PORTB = 0xff; // To be checked!!
+						PBCTL = 0x00; // To be checked!!
 						HAL_Delay(500); // Assert Reset for at least 500 millis
+						GREEN_LED_OFF;
 						ATARI_RESET_DEASSERT;
 						watchdog = 0xff;
 					}
