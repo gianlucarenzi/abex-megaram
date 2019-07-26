@@ -42,7 +42,7 @@ extern "C" {
 #include "stm32f4xx.h"
 #include "stm32f4xx_ll_gpio.h"
 
-void Error_Handler(void);
+extern void Error_Handler(const char *c);
 
 /* ADDRESS BUS PINS 16BIT */
 #define m_A15_Pin LL_GPIO_PIN_15

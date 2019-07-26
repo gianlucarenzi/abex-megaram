@@ -30,6 +30,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "syscall.h"
+#include "debug.h"
 #include "main.h"
 
 typedef enum {
@@ -90,57 +92,13 @@ static uint8_t EMULATION_TYPE = EXPANSION_TYPE_NONE;
 #define RAMSIZ (63 * 0x4000)
 unsigned char expansion_ram[RAMSIZ] __attribute__((section(".sram")));
 
-enum {
-	DBG_ERROR = 0,
-	DBG_INFO,
-	DBG_VERBOSE,
-	DBG_NOISY,
-};
-
 static int debuglevel = DBG_INFO;
-#define PDEBUG(str)  usart_putstring(str)
-/* ANSI Eye-Candy ;-) */
-#define ANSI_RED    "\x1b[31m"
-#define ANSI_GREEN  "\x1b[32m"
-#define ANSI_YELLOW "\x1b[1;33m"
-#define ANSI_BLUE   "\x1b[1;34m"
-#define ANSI_RESET  "\x1b[0m"
-#define DBG_E(str)  PDEBUG(ANSI_RED); PDEBUG(str); PDEBUG(ANSI_RESET);
-#define DBG_I(str)  if (debuglevel >= DBG_INFO)    { PDEBUG(ANSI_GREEN);  PDEBUG(str); PDEBUG(ANSI_RESET); }
-#define DBG_V(str)  if (debuglevel >= DBG_VERBOSE) { PDEBUG(ANSI_BLUE);   PDEBUG(str); PDEBUG(ANSI_RESET); }
-#define DBG_N(str)  if (debuglevel >= DBG_NOISY)   { PDEBUG(ANSI_YELLOW); PDEBUG(str); PDEBUG(ANSI_RESET); }
 
 SRAM_HandleTypeDef hsram1;
 void SystemClock_Config(void);
 static void gpio_init(void);
 static void fmc_sram_init(void);
 static void usart_config(int baudrate);
-
-static void usart_write_byte(uint8_t c)
-{
-	/* Wait for TXE flag to be raised */
-	while (!LL_USART_IsActiveFlag_TXE(USART1))
-		;;
-
-	LL_USART_ClearFlag_TC(USART1);
-
-	LL_USART_TransmitData8(USART1, c);
-}
-
-static void usart_putchar(char c)
-{
-	// For character we are using from 0 to 127 ASCII
-	usart_write_byte((uint8_t) c);
-}
-
-static void usart_putstring(char *s)
-{
-	// Send a string
-	while (*s)
-	{
-		usart_putchar(*s++);
-	}
-}
 
 /**
   * @brief System Clock Configuration
@@ -152,7 +110,7 @@ void SystemClock_Config(void)
 
 	if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_5)
 	{
-		Error_Handler();  
+		Error_Handler("SystemClock_Config");  
 	}
 	LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
 	LL_PWR_EnableOverDriveMode();
@@ -263,7 +221,7 @@ static void fmc_sram_init(void)
 
 	if (HAL_SRAM_Init(&hsram1, &Timing, NULL) != HAL_OK)
 	{
-		Error_Handler( );
+		Error_Handler("fmc_sram_init");
 	}
 
 }
@@ -388,42 +346,28 @@ static void banner(t_expansion type)
 	switch(type)
 	{
 		case EXPANSION_TYPE_130XE:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("130XE 128K EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "130XE 128K EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_192K:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("192K (COMPYSHOP) EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "192K (COMPYSHOP) EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_256K_RAMBO:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("256K RAMBO EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "256K RAMBO EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_320K_COMPYSHOP:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("320K COMPYSHOP EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "320K COMPYSHOP EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_320K:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("320K (RAMBO) EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "320K (RAMBO) EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_576K_MOD:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("576K MOD EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "576K MOD EXPANSION\r\n" ANSI_RESET);
 			break;
 		case EXPANSION_TYPE_1088K_MOD:
-			PDEBUG(ANSI_BLUE);
-			PDEBUG("1088K MOD EXPANSION\r\n");
-			PDEBUG(ANSI_RESET);
+			printf(ANSI_BLUE "1088K MOD EXPANSION\r\n" ANSI_RESET);
 			break;
 		default:
-			DBG_E("UNKNOWN EXPANSION TYPE!\r\n");
+			printf(ANSI_RED "UNKNOWN EXPANSION TYPE!\r\n" ANSI_RESET);
 			break;
 	}
 	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
@@ -460,6 +404,8 @@ int main(void)
 	uint8_t c;
 	uint8_t watchdog = 0xff;
 
+	_write_ready(SYSCALL_NOTREADY); // printf is not functional here
+ 
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
 	HAL_Init();
 	/* Configure the system clock */
@@ -469,10 +415,13 @@ int main(void)
 	gpio_init();
 	/* keep ATARI on RESET as soon as possible */
 	ATARI_RESET_ASSERT;
-	/* Static RAM FMC Configure */
-	fmc_sram_init();
+
 	/* Configure USART1 for 115200 8N1 */
 	usart_config(115200);
+	_write_ready(SYSCALL_READY); // printf is functional from now on...
+
+	/* Static RAM FMC Configure */
+	fmc_sram_init();
 
 	/* Read CONFx (0,1,2) from DIP-SWITCH */
 	EMULATION_TYPE = MEMORY_EXPANSION_TYPE;
@@ -489,7 +438,7 @@ int main(void)
 
 	banner(EMULATION_TYPE);
 
-	HAL_Delay(500);
+	mdelay(500);
 
 	GREEN_LED_OFF; // Now starts with led off. Only accessing external RAM will blink!
 
@@ -619,7 +568,7 @@ int main(void)
 						banner(EMULATION_TYPE);
 						PORTB = 0xff; // To be checked!!
 						PBCTL = 0x00; // To be checked!!
-						HAL_Delay(500); // Assert Reset for at least 500 millis
+						mdelay(500); // Assert Reset for at least 500 millis
 						GREEN_LED_OFF;
 						ATARI_RESET_DEASSERT;
 						watchdog = 0xff;
@@ -837,8 +786,9 @@ int main(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
+void Error_Handler(const char *c)
 {
+	DBG_E("%s\n\r", c);
 	for (;;)
 		;;
 }
@@ -855,6 +805,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 { 
 	/* User can add his own implementation to report the file name and line number,
 	 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	DBG_E("Error! Wrong parameters value: file %s on line %d\r\n", file, line);
 	for (;;)
 		;;
 }

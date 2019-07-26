@@ -23,7 +23,8 @@ C_SOURCES +=  \
 	src/main.c \
 	src/stm32f4xx_it.c \
 	src/stm32f4xx_hal_msp.c \
-	src/system_stm32f4xx.c  
+	src/system_stm32f4xx.c  \
+	src/syscall.c 
 
 # ASM sources
 ASM_SOURCES +=  \
