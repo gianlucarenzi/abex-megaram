@@ -221,7 +221,7 @@ LibName189=Amplifier_Video
 LibName190=Amplifier_Instrumentation
 LibName191=Amplifier_Buffer
 LibName192=ft232rl
-LibName193=/home/debian/Progetti/RetroBitLab-Library/AmigaComponents
+LibName193=/home/debian/Progetti/RetroBitLab-Library/RetroBitLab
 [schematic_editor]
 version=1
 PageLayoutDescrFile=

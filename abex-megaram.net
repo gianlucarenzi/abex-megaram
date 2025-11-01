@@ -113,13 +113,13 @@
         (field (name Field6) None)
         (field (name Field7) 0877159106)
         (field (name Field8) "Conn PCI Express Card Edge SKT 64 POS 2mm Solder ST Thru-Hole PCI Express Tray"))
-      (libsource (lib AmigaComponents) (part 0877159106))
+      (libsource (lib RetroBitLab) (part 0877159106))
       (sheetpath (names /) (tstamps /))
       (tstamp 5CDE4EC6))
     (comp (ref U1)
       (value ISSI61WV5128BL)
       (footprint RetroBitLab:SOP-32L-20.5x11.30-1.27mm)
-      (libsource (lib AmigaComponents) (part ISSI61WV5128BL))
+      (libsource (lib RetroBitLab) (part ISSI61WV5128BL))
       (sheetpath (names "/Static RAM/") (tstamps /5C2B74C3/))
       (tstamp 5C2B9006))
     (comp (ref C2)
@@ -131,7 +131,7 @@
     (comp (ref U2)
       (value ISSI61WV5128BL)
       (footprint RetroBitLab:SOP-32L-20.5x11.30-1.27mm)
-      (libsource (lib AmigaComponents) (part ISSI61WV5128BL))
+      (libsource (lib RetroBitLab) (part ISSI61WV5128BL))
       (sheetpath (names "/Static RAM/") (tstamps /5C2B74C3/))
       (tstamp 5D348507))
     (comp (ref C3)
@@ -417,7 +417,7 @@
       (sheetpath (names /MCU_MEMORY/) (tstamps /5CA8B01A/))
       (tstamp 5D342CF5)))
   (libparts
-    (libpart (lib AmigaComponents) (part 0877159106)
+    (libpart (lib RetroBitLab) (part 0877159106)
       (description "PCI Express 4.0 64 pins")
       (fields
         (field (name Reference) P)
@@ -562,7 +562,7 @@
       (pins
         (pin (num 1) (name 1) (type passive))
         (pin (num 2) (name 2) (type passive))))
-    (libpart (lib AmigaComponents) (part ISSI61WV5128BL)
+    (libpart (lib RetroBitLab) (part ISSI61WV5128BL)
       (aliases
         (alias IS61WV5129BL))
       (description "SRAM 4Mbit 512Kx8 CMOS 10ns")
@@ -841,8 +841,8 @@
       (uri /home/debian/packages/kicad/kicad-symbols/Switch.lib))
     (library (logical MCU_ST_STM32F4)
       (uri /home/debian/packages/kicad/kicad-symbols/MCU_ST_STM32F4.lib))
-    (library (logical AmigaComponents)
-      (uri /home/debian/Progetti/RetroBitLab-Library/AmigaComponents.lib))
+    (library (logical RetroBitLab)
+      (uri /home/debian/Progetti/RetroBitLab-Library/RetroBitLab.lib))
     (library (logical abex-megaram-cache)
       (uri /home/debian/Progetti/Atari/abex-megaram/abex-megaram-cache.lib)))
   (nets

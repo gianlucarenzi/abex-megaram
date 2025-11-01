@@ -191,7 +191,7 @@ LIBS:Amplifier_Video
 LIBS:Amplifier_Instrumentation
 LIBS:Amplifier_Buffer
 LIBS:ft232rl
-LIBS:AmigaComponents
+LIBS:RetroBitLab
 LIBS:abex-megaram-cache
 EELAYER 25 0
 EELAYER END
