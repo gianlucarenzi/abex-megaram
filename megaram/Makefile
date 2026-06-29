@@ -88,6 +88,18 @@ $(BUILD_DIR):
 	mkdir $@
 
 #######################################
+# OpenOCD targets
+#######################################
+flash: $(BUILD_DIR)/$(TARGET).elf
+	$(ST_OCD) $(OCD_FLAGS) -c "init; targets; reset init; wait_halt; poll; flash write_image erase unlock $<; reset run; shutdown"
+
+halt:
+	$(ST_OCD) $(OCD_FLAGS) -c "init; targets; reset init; wait_halt; poll; shutdown"
+
+reset:
+	$(ST_OCD) $(OCD_FLAGS) -c "init; targets; reset init; wait_halt; poll; reset run; shutdown"
+
+#######################################
 # clean up
 #######################################
 clean:
