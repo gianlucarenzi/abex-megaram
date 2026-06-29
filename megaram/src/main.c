@@ -46,21 +46,10 @@ typedef enum {
     EXPANSION_TYPE_NONE,            // LAST
 } t_expansion;
 
-typedef enum {
-	WRITERAM = 0,
-	READRAM,
-} t_command;
-
 #define CONTROL_IN  GPIOI->IDR
 #define ADDR_IN     GPIOC->IDR
 #define DATA_IN     GPIOA->IDR
 #define DATA_OUT    GPIOA->ODR
-
-#define PHI2_RD        (GPIOI->IDR & 0x0001)
-#define S5_RD          (GPIOI->IDR & 0x0002)
-#define S4_RD          (GPIOI->IDR & 0x0004)
-#define S4_AND_S5_HIGH (GPIOI->IDR & 0x0006) == 0x6
-#define D1XX_RD        (GPIOI->IDR & 0x0008)
 
 #define PHI2    0x0001
 #define S5      0x0002
@@ -69,8 +58,9 @@ typedef enum {
 #define CCTL    0x0010
 #define RW      0x0020
 
-#define SET_DATA_MODE_IN        GPIOA->MODER = 0x00000000;
-#define SET_DATA_MODE_OUT       GPIOA->MODER = 0x00005555;
+/* Only PA0-PA7 (D0-D7) change mode; PA8-PA15 (USART1 PA9/PA10) are preserved */
+#define SET_DATA_MODE_IN        GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000);
+#define SET_DATA_MODE_OUT       GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555;
 
 #define GREEN_LED_OFF           LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);  /* HIGH ACTIVE */
 #define GREEN_LED_ON            LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);    /* HIGH ACTIVE */
@@ -88,8 +78,8 @@ static uint8_t PORTB = 0xFF;
 static uint8_t PBCTL = 0x00;
 static uint8_t EMULATION_TYPE = EXPANSION_TYPE_NONE;
 
-/* We can have up to 1008K! */
-#define RAMSIZ (63 * 0x4000)
+/* 64 banks x 16K = 1024K external; 1024K + 64K internal = 1088K total */
+#define RAMSIZ (64 * 0x4000)
 unsigned char expansion_ram[RAMSIZ] __attribute__((section(".sram")));
 
 static int debuglevel = DBG_INFO;
@@ -202,7 +192,7 @@ static void fmc_sram_init(void)
 	hsram1.Init.WaitSignalPolarity = FMC_WAIT_SIGNAL_POLARITY_LOW;
 	hsram1.Init.WrapMode = FMC_WRAP_MODE_DISABLE;
 	hsram1.Init.WaitSignalActive = FMC_WAIT_TIMING_BEFORE_WS;
-	hsram1.Init.WriteOperation = FMC_WRITE_OPERATION_DISABLE;
+	hsram1.Init.WriteOperation = FMC_WRITE_OPERATION_ENABLE;
 	hsram1.Init.WaitSignal = FMC_WAIT_SIGNAL_DISABLE;
 	hsram1.Init.ExtendedMode = FMC_EXTENDED_MODE_DISABLE;
 	hsram1.Init.AsynchronousWait = FMC_ASYNCHRONOUS_WAIT_DISABLE;
@@ -273,16 +263,16 @@ static void gpio_init(void)
 	
 	/* --------------------------------
 	 * CONFIGURATION PIN EMULATION TYPE
-	 * -------------------------------- 
+	 * --------------------------------
 	 * ----------------------------------------
 	 *    EXPANSION_TYPE_130XE          = 0 0 0
-	 *    EXPANSION_TYPE_192K_COMPYSHOP = 0 0 1
-	 *    EXPANSION_TYPE_320K_RAMBO     = 0 1 0
-	 *    EXPANSION_TYPE_320K_COMPYSHOP = 0 1 1
-	 *    EXPANSION_TYPE_576K_MOD       = 1 0 0
-	 *    EXPANSION_TYPE_1088K_MOD      = 1 0 1
-	 *    UNUSED                        = 1 1 0
-	 *    UNUSED                        = 1 1 1
+	 *    EXPANSION_TYPE_192K           = 0 0 1
+	 *    EXPANSION_TYPE_256K_RAMBO     = 0 1 0
+	 *    EXPANSION_TYPE_320K           = 0 1 1
+	 *    EXPANSION_TYPE_320K_COMPYSHOP = 1 0 0
+	 *    EXPANSION_TYPE_576K_MOD       = 1 0 1
+	 *    EXPANSION_TYPE_576K_COMPYSHOP = 1 1 0
+	 *    EXPANSION_TYPE_1088K_MOD      = 1 1 1
 	 * ---------------------------------------- */
 	GPIO_InitStruct.Pin |= 
 		CONF0_Pin | CONF1_Pin | CONF2_Pin;
@@ -721,10 +711,6 @@ int main(void)
 									// RAM must be disabled!
 									INTERNAL_RAM_DISABLE;
 									bank = (((PORTB & 0x0e) + ((PORTB & 0xe0) >> 1)) >> 1);
-									/* On real hardware we have 63 banks available, not 64
-									 * BANKS are from 0 to 63!! */
-									if (bank == 63)
-										bank--;
 									external_ram_enable = 1;
 								}
 								break;
