@@ -374,7 +374,7 @@ static void banner(t_expansion type)
 			printf(ANSI_RED "UNKNOWN EXPANSION TYPE!\r\n" ANSI_RESET);
 			break;
 	}
-	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
+	DBG_I("(C) RetroBit Lab 2019/2026 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
 }
 
 static void init_bank_lut(t_expansion type)
