@@ -1,0 +1,504 @@
+$date
+	Mon Jun 29 12:33:32 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_top $end
+$var wire 8 ! atari_data [7:0] $end
+$var wire 1 " sram_we_n $end
+$var wire 1 # sram_oe_n $end
+$var wire 1 $ sram_ce_n $end
+$var wire 20 % sram_addr [19:0] $end
+$var wire 1 & extsel_n $end
+$var reg 16 ' addr [15:0] $end
+$var reg 8 ( atari_data_drive [7:0] $end
+$var reg 1 ) atari_data_en $end
+$var reg 3 * conf [2:0] $end
+$var reg 1 + phi2 $end
+$var reg 1 , rw $end
+$var integer 32 - errors [31:0] $end
+$scope module dut $end
+$var wire 16 . addr [15:0] $end
+$var wire 8 / atari_data [7:0] $end
+$var wire 3 0 conf [2:0] $end
+$var wire 1 1 is_pbctl $end
+$var wire 1 2 is_pia $end
+$var wire 1 3 is_portb $end
+$var wire 1 + phi2 $end
+$var wire 1 , rw $end
+$var wire 1 4 sram_rd $end
+$var wire 1 5 sram_sel $end
+$var wire 1 6 sram_wr $end
+$var wire 1 " sram_we_n $end
+$var wire 1 # sram_oe_n $end
+$var wire 1 $ sram_ce_n $end
+$var wire 20 7 sram_addr [19:0] $end
+$var wire 1 8 ram_active $end
+$var wire 8 9 portb [7:0] $end
+$var wire 8 : pia_data_out [7:0] $end
+$var wire 1 ; pia_data_oe $end
+$var wire 8 < pbctl [7:0] $end
+$var wire 1 = is_window $end
+$var wire 1 > is_d3xx $end
+$var wire 1 & extsel_n $end
+$var wire 6 ? bank [5:0] $end
+$scope module u_bsw $end
+$var wire 3 @ conf [2:0] $end
+$var wire 1 A pbctl_crb2 $end
+$var wire 8 B portb [7:0] $end
+$var wire 6 C bank [5:0] $end
+$var wire 1 8 active $end
+$var reg 1 8 active_r $end
+$var reg 6 D bank_r [5:0] $end
+$upscope $end
+$scope module u_pia $end
+$var wire 8 E data_in [7:0] $end
+$var wire 1 ; data_oe $end
+$var wire 1 + phi2 $end
+$var wire 1 2 pia_sel $end
+$var wire 2 F rs [1:0] $end
+$var wire 1 , rw $end
+$var wire 8 G data_out [7:0] $end
+$var wire 8 H d301_rd [7:0] $end
+$var reg 8 I ddrb [7:0] $end
+$var reg 8 J pbctl [7:0] $end
+$var reg 8 K portb [7:0] $end
+$upscope $end
+$upscope $end
+$scope task bus_read $end
+$var reg 16 L a [15:0] $end
+$var reg 8 M rd [7:0] $end
+$upscope $end
+$scope task bus_write $end
+$var reg 16 N a [15:0] $end
+$var reg 8 O d [7:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx O
+bx N
+bx M
+bx L
+b11111111 K
+b0 J
+b0 I
+b0 H
+b0 G
+b0 F
+bz E
+b0 D
+b0 C
+b11111111 B
+0A
+b0 @
+b0 ?
+0>
+0=
+b0 <
+0;
+b0 :
+b11111111 9
+08
+b0 7
+06
+05
+04
+03
+02
+01
+b0 0
+bz /
+b0 .
+b0 -
+1,
+0+
+b0 *
+0)
+bx (
+b0 '
+1&
+b0 %
+1$
+1#
+1"
+bz !
+$end
+#100000
+b111100 O
+b1101001100000011 N
+#279000
+1+
+#558000
+12
+11
+b111100 !
+b111100 /
+b111100 E
+1>
+b11 F
+b1001100000011 %
+b1001100000011 7
+0,
+1)
+b111100 (
+b1101001100000011 '
+b1101001100000011 .
+0+
+#837000
+1+
+#1116000
+b11111111 H
+b111100 :
+b111100 G
+1A
+b111100 <
+b111100 J
+0+
+#1121000
+bz !
+bz /
+bz E
+1,
+0)
+#1171000
+b11101100 O
+b1101001100000001 N
+#1395000
+b111100 !
+b111100 /
+b111100 E
+1;
+1+
+#1674000
+0;
+13
+01
+b11111111 :
+b11111111 G
+b11101100 !
+b11101100 /
+b11101100 E
+b1 F
+b1001100000001 %
+b1001100000001 7
+0,
+1)
+b11101100 (
+b1101001100000001 '
+b1101001100000001 .
+0+
+#1953000
+1+
+#2232000
+b11101100 :
+b11101100 G
+b11101100 H
+18
+b1101001100000001 %
+b1101001100000001 7
+b11 ?
+b11 C
+b11 D
+b11101100 9
+b11101100 B
+b11101100 K
+0+
+#2237000
+bz !
+bz /
+bz E
+1,
+0)
+#2511000
+b11101100 !
+b11101100 /
+b11101100 E
+1;
+1+
+#2790000
+02
+bz !
+bz /
+bz E
+0;
+03
+b111100 :
+b111100 G
+1=
+0>
+b0 F
+b1101000000000000 %
+b1101000000000000 7
+b101000000000000 '
+b101000000000000 .
+0+
+#3069000
+bx !
+bx /
+bx E
+0#
+14
+0$
+0&
+15
+1+
+#3348000
+bz !
+bz /
+bz E
+1#
+04
+1$
+1&
+05
+0+
+#3353000
+b1010101 O
+b101000000000000 N
+#3627000
+bx !
+bx /
+bx E
+0#
+14
+0$
+0&
+15
+1+
+#3906000
+b1010101 !
+b1010101 /
+b1010101 E
+1$
+1&
+05
+1#
+04
+1"
+06
+0,
+1)
+b1010101 (
+0+
+#4185000
+0"
+16
+0$
+0&
+15
+1+
+#4464000
+1"
+06
+1$
+1&
+05
+0+
+#4469000
+bz !
+bz /
+bz E
+1,
+0)
+#4519000
+b11111100 O
+b1101001100000001 N
+#4743000
+b1010101 !
+b1010101 /
+b1010101 E
+0#
+14
+0$
+0&
+15
+1+
+#5022000
+12
+13
+b11101100 :
+b11101100 G
+1$
+1&
+05
+1#
+04
+1"
+06
+b11111100 !
+b11111100 /
+b11111100 E
+0=
+1>
+b1 F
+b1101001100000001 %
+b1101001100000001 7
+0,
+1)
+b11111100 (
+b1101001100000001 '
+b1101001100000001 .
+0+
+#5301000
+1+
+#5580000
+b11111100 :
+b11111100 G
+b11111100 H
+08
+b1001100000001 %
+b1001100000001 7
+b0 ?
+b0 C
+b0 D
+b11111100 9
+b11111100 B
+b11111100 K
+0+
+#5585000
+bz !
+bz /
+bz E
+1,
+0)
+#5859000
+b11111100 !
+b11111100 /
+b11111100 E
+1;
+1+
+#6138000
+02
+bz !
+bz /
+bz E
+0;
+03
+b111100 :
+b111100 G
+1=
+0>
+b0 F
+b1000000000000 %
+b1000000000000 7
+b101000000000000 '
+b101000000000000 .
+0+
+#6417000
+1+
+#6696000
+b100 O
+b1101001100000011 N
+b10 *
+b10 0
+b10 @
+0+
+#6975000
+1+
+#7254000
+12
+11
+b100 !
+b100 /
+b100 E
+0=
+1>
+b11 F
+b1001100000011 %
+b1001100000011 7
+0,
+1)
+b100 (
+b1101001100000011 '
+b1101001100000011 .
+0+
+#7533000
+1+
+#7812000
+b100 :
+b100 G
+b100 <
+b100 J
+0+
+#7817000
+bz !
+bz /
+bz E
+b11110000 O
+b1101001100000001 N
+1,
+0)
+#8091000
+b100 !
+b100 /
+b100 E
+1;
+1+
+#8370000
+0;
+13
+01
+b11111100 :
+b11111100 G
+b11110000 !
+b11110000 /
+b11110000 E
+b1 F
+b1001100000001 %
+b1001100000001 7
+0,
+1)
+b11110000 (
+b1101001100000001 '
+b1101001100000001 .
+0+
+#8649000
+1+
+#8928000
+b11110000 :
+b11110000 G
+b11110000 H
+b11110000 9
+b11110000 B
+b11110000 K
+0+
+#8933000
+bz !
+bz /
+bz E
+1,
+0)
+#9207000
+b11110000 !
+b11110000 /
+b11110000 E
+1;
+1+
+#9486000
+02
+bz !
+bz /
+bz E
+0;
+03
+b100 :
+b100 G
+1=
+0>
+b0 F
+b1000000000000 %
+b1000000000000 7
+b101000000000000 '
+b101000000000000 .
+0+
+#9765000
+1+
+#10044000
+0+
+#10244000
