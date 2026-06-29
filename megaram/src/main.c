@@ -85,6 +85,10 @@ static uint8_t EMULATION_TYPE = EXPANSION_TYPE_NONE;
 #define RAMSIZ (64 * 0x4000)
 unsigned char expansion_ram[RAMSIZ] __attribute__((section(".sram")));
 
+/* Bank lookup table: bank_lut[PORTB] -> bank number, 0xFF = no external access.
+ * Placed in CCMRAM (zero wait states, directly connected to Cortex-M4 core). */
+static uint8_t bank_lut[256] __attribute__((section(".ccmram")));
+
 static int debuglevel = DBG_INFO;
 
 SRAM_HandleTypeDef hsram1;
@@ -92,6 +96,7 @@ void SystemClock_Config(void);
 static void gpio_init(void);
 static void fmc_sram_init(void);
 static void usart_config(int baudrate);
+static void init_bank_lut(t_expansion type);
 
 /**
   * @brief System Clock Configuration
@@ -372,6 +377,54 @@ static void banner(t_expansion type)
 	DBG_I("(C) RetroBit Lab 2019 written by Gianluca Renzi <icjtqr@gmail.com>\r\n");
 }
 
+static void init_bank_lut(t_expansion type)
+{
+	for (int i = 0; i < 256; i++)
+	{
+		uint8_t p = (uint8_t)i;
+		uint8_t b;
+		switch (type)
+		{
+			case EXPANSION_TYPE_130XE:
+				b = ((p & 0x30) != 0x30) ? ((p & 0x0c) >> 2) : 0xFF;
+				break;
+			case EXPANSION_TYPE_192K:
+				b = ((p & 0x30) != 0x30) ?
+					(((p & 0x0c) + ((p & 0x40) >> 2)) >> 2) : 0xFF;
+				break;
+			case EXPANSION_TYPE_256K_RAMBO: {
+				uint8_t bk = (((p & 0x0c) + ((p & 0x60) >> 1)) >> 2);
+				b = (p & 0x10) ? (bk & 0x3) : bk;
+				break;
+			}
+			case EXPANSION_TYPE_320K:
+				b = (!(p & 0x10)) ?
+					(((p & 0x0c) + ((p & 0x60) >> 1)) >> 2) : 0xFF;
+				break;
+			case EXPANSION_TYPE_320K_COMPYSHOP:
+				b = ((p & 0x30) != 0x30) ?
+					(((p & 0x0c) + ((p & 0xc0) >> 2)) >> 2) : 0xFF;
+				break;
+			case EXPANSION_TYPE_576K_MOD:
+				b = (!(p & 0x10)) ?
+					(((p & 0x0e) + ((p & 0x60) >> 1)) >> 1) : 0xFF;
+				break;
+			case EXPANSION_TYPE_576K_COMPYSHOP:
+				b = (!(p & 0x10)) ?
+					(((p & 0x0e) + ((p & 0xc0) >> 2)) >> 1) : 0xFF;
+				break;
+			case EXPANSION_TYPE_1088K_MOD:
+				b = (!(p & 0x10)) ?
+					(((p & 0x0e) + ((p & 0xe0) >> 1)) >> 1) : 0xFF;
+				break;
+			default:
+				b = 0xFF;
+				break;
+		}
+		bank_lut[i] = b;
+	}
+}
+
 /**
   * @brief  Theory of operation:
   * 
@@ -428,6 +481,7 @@ int main(void)
 
 	/* Read CONFx (0,1,2) from DIP-SWITCH */
 	EMULATION_TYPE = MEMORY_EXPANSION_TYPE;
+	init_bank_lut(EMULATION_TYPE);
 
 	GREEN_LED_ON; // Means board is alive!
 	// Reset EXTERNAL RAM
@@ -456,13 +510,9 @@ int main(void)
 	{
 		// Wait for a valid sequence in the bus
 
-		// wait for phi2 high
-		while (!(gpioi->IDR & PHI2))
+		/* Capture control signals atomically on first PHI2-high sample */
+		while (!((c = gpioi->IDR) & PHI2))
 			;
-		c = gpioi->IDR;
-
-		// Check for address only if there is a valid state of the PHI2
-		// on the bus!
 		addr = gpioc->IDR;
 
 		switch (addr)
@@ -571,6 +621,7 @@ int main(void)
 						GREEN_LED_ON;
 						ATARI_RESET_ASSERT;
 						banner(EMULATION_TYPE);
+						init_bank_lut(EMULATION_TYPE);
 						PORTB = 0xff; // To be checked!!
 						PBCTL = 0x00; // To be checked!!
 						mdelay(500); // Assert Reset for at least 500 millis
@@ -587,164 +638,24 @@ int main(void)
 				break;
 
 			default:
-				/* WINDOW BANKED MEMORY ACCESS 16K */
+				/* WINDOW BANKED MEMORY ACCESS 16K ($4000-$7FFF) */
 				if (addr >= 0x4000 && addr < 0x8000)
 				{
-					uint16_t rel_addr;
-					rel_addr = addr - 0x4000; /* Relative address here */
-
-					/*
-						D2 Data direction register enable
-							0 PORTB [D301] accesses data direction register
-							1 PORTB [D301] accesses input and output registers
-					*/
-					// We can have expansion ram access only if PBCTL bit 2 is 1!
+					/* Expansion RAM accessible only when PBCTL bit 2 (DDR) is set */
 					if (PBCTL & (1 << 2))
 					{
-						uint8_t bank = 0;
-						uint32_t internal_address; /* from 0 to 1048575 (0x100000)*/
-						uint8_t external_ram_enable = 0;
-						/**
-							7  6  5  4  3  2  1  0
-							----------------------
-							Bank bits:
-							128K:		bits 2, 3             (0x0c) >> 2
-							192K:		bits 2, 3, 6          (0x4c) ((0x40) >> 2 + (0x0c)) >> 2
-							256K Rambo:	bits 2, 3, 5, 6       (when bit 4 is cleared we can access to the extra 12 banks otherwise only at the first 4)
-							320K:		bits 2, 3, 5, 6       (0x6c) ((0x60) >> 1 + (0x0c)) >> 2
-							320K COMPY:	bits 2, 3, 6, 7       (0xcc) ((0xc0) >> 2 + (0x0c)) >> 2
-							576K:		bits 1, 2, 3, 5, 6    (0x6e) ((0x60) >> 1 + (0x0e)) >> 1
-							576K COMPY:	bits 1, 2, 3, 6, 7    (0xce) ((0xc0) >> 2 + (0x0e)) >> 1
-							1088K:		bits 1, 2, 3, 5, 6, 7 (0xee) ((0xe0) >> 1 + (0x0e)) >> 1
-						**/
+						/* bank_lut[PORTB]: precomputed bank index, 0xFF = no access */
+						uint8_t bank = bank_lut[PORTB];
 
-						/* Calculate which bankno has to be accessed, depending
-						 * on emulation of expansion type */
-						switch (EMULATION_TYPE)
+						if (bank != 0xFF)
 						{
-							case EXPANSION_TYPE_130XE:
-								/*
-								 * Accessing to extra RAM ONLY if VBE and CBE (Video Bank Enabled) (clear)
-								 * (CPU Bank Enabled) (clear) (so bit 4 and 5 are always zero)
-								 */
-								if ((PORTB & 0x30) != 0x30) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									/* Only bit 2 and 3 are usable: 4 banks in total
-									 * 4 x 16k = 64k of expanded memory */
-									bank = (PORTB & 0x0c) >> 2;
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_192K:
-								/*
-								 * Accessing to extra RAM ONLY if VBE and CBE (Video Bank Enabled) (clear)
-								 * (CPU Bank Enabled) (clear) (so bit 4 and 5 are always zero)
-								 */
-								if ((PORTB & 0x30) != 0x30) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									/* Only bit 2, 3 and 6 are usable: 8 banks in total
-									 * 8 x 16k = 128k of expanded memory */
-									bank = (((PORTB & 0x0c) + ((PORTB & 0x40) >> 2)) >> 2);
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_256K_RAMBO:
-								// When accessing the external RAM the internal
-								// RAM must be disabled!
-								INTERNAL_RAM_DISABLE;
-								/* Good! We can access our AtariMegaRAM EXPANSION! */
-								GREEN_LED_ON;
-								bank = (((PORTB & 0x0c) + ((PORTB & 0x60) >> 1)) >> 2);
-								if (PORTB & 0x10) {
-									/* As ref. http://www.atarimania.com/documents/rambo_manual.pdf
-									 * page 14, enable RAMBO Memory if RAME (bit 4) is enabled (clear) */
-									/* otherwise we can have accesso only to the first 4 banks */
-									bank = bank & 0x3; 
-								}
-								external_ram_enable = 1;
-								break;
-							case EXPANSION_TYPE_320K:
-								// Access to extra 256k ram expansion (320k in
-								// total) only if the CBE is cleared
-								if ((PORTB & 0x10) != 0x10)
-								{
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									bank = (((PORTB & 0x0c) + ((PORTB & 0x60) >> 1)) >> 2);
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_320K_COMPYSHOP:
-								if ((PORTB & 0x30) != 0x30) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									bank = (((PORTB & 0x0c) + ((PORTB & 0xc0) >> 2)) >> 2);
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_576K_MOD:
-								if ((PORTB & 0x10) != 0x10) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									bank = (((PORTB & 0x0e) + ((PORTB & 0x60) >> 1)) >> 1);
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_576K_COMPYSHOP:
-								if ((PORTB & 0x10) != 0x10) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									bank = (((PORTB & 0x0e) + ((PORTB & 0xc0) >> 2)) >> 1);
-									external_ram_enable = 1;
-								}
-								break;
-							case EXPANSION_TYPE_1088K_MOD:
-								if ((PORTB & 0x10) != 0x10) {
-									/* Good! We can access our AtariMegaRAM EXPANSION! */
-									GREEN_LED_ON;
-									// When accessing the external RAM the internal
-									// RAM must be disabled!
-									INTERNAL_RAM_DISABLE;
-									bank = (((PORTB & 0x0e) + ((PORTB & 0xe0) >> 1)) >> 1);
-									external_ram_enable = 1;
-								}
-								break;
-							default:
-								DBG_E("Unknown MEMORY EXPANSION\n\r");
-								external_ram_enable = 0;
-								break;
-						}
+							uint32_t internal_address =
+								((uint32_t)bank << 14) | (addr - 0x4000);
+							INTERNAL_RAM_DISABLE;
+							GREEN_LED_ON;
 
-						if (external_ram_enable)
-						{
-							internal_address = (bank * 0x4000) + rel_addr;
-
-							// ATARI CPU Needs to WRITE Data?
 							if (!(c & RW))
 							{
-								// Now we can write the data at the desired address
-								// stored in the external ram expansion
-								// read the data bus on falling edge of phi2
 								while (gpioi->IDR & PHI2)
 									;
 								data = gpioa->IDR;
@@ -752,28 +663,16 @@ int main(void)
 							}
 							else
 							{
-								// CPU Needs to READ Data from external memory
 								SET_DATA_MODE_OUT
 								gpioa->ODR = expansion_ram[internal_address];
-								// wait for phi2 low
 								while (gpioi->IDR & PHI2)
 									;
 								SET_DATA_MODE_IN
 							}
-
 							GREEN_LED_OFF;
 						}
 						INTERNAL_RAM_ENABLE;
 					}
-					else
-					{
-						// PBCTL Bit 2 is not set, so do nothing with
-						// external memory
-					}
-				}
-				else
-				{
-					// Other address needed, DO NOTHING
 				}
 				break;
 		}
