@@ -1,7 +1,7 @@
 #include <errno.h>
 #include <sys/unistd.h> // STDOUT_FILENO, STDERR_FILENO
 #include "syscall.h"
-#include <stm32f4xx_ll_usart.h>
+#include <stm32h5xx_ll_usart.h>
 #include "debug.h"
 
 static t_syscall_status uart_initialize = SYSCALL_NOTREADY;

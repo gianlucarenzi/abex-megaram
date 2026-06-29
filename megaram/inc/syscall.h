@@ -2,7 +2,7 @@
 #define __SYSCALL_INCLUDED__
 
 #include <stdio.h>
-#include <stm32f4xx_hal.h>
+#include <stm32h5xx_hal.h>
 typedef enum {
 	SYSCALL_NOTREADY,
 	SYSCALL_READY,

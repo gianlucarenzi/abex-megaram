@@ -1,25 +1,15 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
+  * @file    main.h
+  * @brief   ABEX-MEGARAM — STM32H5E5ZJ port (Cortex-M33 @ 250 MHz)
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
+  * TODO: once the H5E5ZJ PCB schematic is finalised, update:
+  *   1. CONTROL_PORT / ADDR_PORT / DATA_PORT / OUTPUT_PORT macros
+  *   2. All _Pin and _GPIO_Port defines
+  *   3. DEBUG_TX_Pin / DEBUG_RX_Pin / DEBUG_AF (USART1 alternate function)
+  *   4. Remove unused GPIO port clock enables in gpio_init() in main.c
   ******************************************************************************
   */
-/* USER CODE END Header */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
 
@@ -27,133 +17,94 @@
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_ll_rcc.h"
-#include "stm32f4xx_ll_bus.h"
-#include "stm32f4xx_ll_system.h"
-#include "stm32f4xx_ll_exti.h"
-#include "stm32f4xx_ll_cortex.h"
-#include "stm32f4xx_ll_utils.h"
-#include "stm32f4xx_ll_pwr.h"
-#include "stm32f4xx_ll_dma.h"
-#include "stm32f4xx_ll_usart.h"
-#include "stm32f4xx.h"
-#include "stm32f4xx_ll_gpio.h"
+/* ── HAL / LL headers (STM32H5 family) ─────────────────────────────────────*/
+#include "stm32h5xx_hal.h"
+#include "stm32h5xx_ll_bus.h"
+#include "stm32h5xx_ll_cortex.h"
+#include "stm32h5xx_ll_gpio.h"
+#include "stm32h5xx_ll_pwr.h"
+#include "stm32h5xx_ll_rcc.h"
+#include "stm32h5xx_ll_system.h"
+#include "stm32h5xx_ll_usart.h"
+#include "stm32h5xx_ll_utils.h"
+#include "stm32h5xx_ll_exti.h"
 
-extern void Error_Handler(const char *c);
+/* ── Port mapping ────────────────────────────────────────────────────────────
+ *
+ * TODO: update all four port defines once the H5E5ZJ PCB schematic is ready.
+ * The names below are carried over from the STM32F429 board as placeholders.
+ */
+#define CONTROL_PORT  GPIOI  /* PHI2, S5, S4, D1XX, CCTL, R/W, CONF0-2 — TODO */
+#define ADDR_PORT     GPIOC  /* A0–A15                                    — TODO */
+#define DATA_PORT     GPIOA  /* D0–D7                                     — TODO */
+#define OUTPUT_PORT   GPIOB  /* LED, RST, EXSEL, RD4/5, IRQ, HALT, MPD   — TODO */
 
-/* ADDRESS BUS PINS 16BIT */
-#define m_A15_Pin LL_GPIO_PIN_15
-#define m_A15_GPIO_Port GPIOC
-#define m_A14_Pin LL_GPIO_PIN_14
-#define m_A14_GPIO_Port GPIOC
-#define m_A13_Pin LL_GPIO_PIN_13
-#define m_A13_GPIO_Port GPIOC
-#define m_A12_Pin LL_GPIO_PIN_12
-#define m_A12_GPIO_Port GPIOC
-#define m_A11_Pin LL_GPIO_PIN_11
-#define m_A11_GPIO_Port GPIOC
-#define m_A10_Pin LL_GPIO_PIN_10
-#define m_A10_GPIO_Port GPIOC
-#define m_A9_Pin LL_GPIO_PIN_9
-#define m_A9_GPIO_Port GPIOC
-#define m_A8_Pin LL_GPIO_PIN_8
-#define m_A8_GPIO_Port GPIOC
-#define m_A7_Pin LL_GPIO_PIN_7
-#define m_A7_GPIO_Port GPIOC
-#define m_A6_Pin LL_GPIO_PIN_6
-#define m_A6_GPIO_Port GPIOC
-#define m_A5_Pin LL_GPIO_PIN_5
-#define m_A5_GPIO_Port GPIOC
-#define m_A4_Pin LL_GPIO_PIN_4
-#define m_A4_GPIO_Port GPIOC
-#define m_A3_Pin LL_GPIO_PIN_3
-#define m_A3_GPIO_Port GPIOC
-#define m_A2_Pin LL_GPIO_PIN_2
-#define m_A2_GPIO_Port GPIOC
-#define m_A1_Pin LL_GPIO_PIN_1
-#define m_A1_GPIO_Port GPIOC
-#define m_A0_Pin LL_GPIO_PIN_0
-#define m_A0_GPIO_Port GPIOC
+/* ── Debug USART ─────────────────────────────────────────────────────────────
+ * TODO: check USART1 TX/RX alternate function number in H5E5ZJ datasheet
+ * (typically AF7, but verify).
+ */
+#define DEBUG_TX_Pin       LL_GPIO_PIN_9  /* USART1 TX — TODO */
+#define DEBUG_TX_GPIO_Port GPIOA          /* TODO */
+#define DEBUG_RX_Pin       LL_GPIO_PIN_10 /* USART1 RX — TODO */
+#define DEBUG_RX_GPIO_Port GPIOA          /* TODO */
+#define DEBUG_AF           LL_GPIO_AF_7   /* USART1 AF on H5 — TODO: verify */
 
-/* DATA BUS 8BIT */
-#define m_D0_Pin LL_GPIO_PIN_0
-#define m_D0_GPIO_Port GPIOA
-#define m_D1_Pin LL_GPIO_PIN_1
-#define m_D1_GPIO_Port GPIOA
-#define m_D2_Pin LL_GPIO_PIN_2
-#define m_D2_GPIO_Port GPIOA
-#define m_D3_Pin LL_GPIO_PIN_3
-#define m_D3_GPIO_Port GPIOA
-#define m_D4_Pin LL_GPIO_PIN_4
-#define m_D4_GPIO_Port GPIOA
-#define m_D5_Pin LL_GPIO_PIN_5
-#define m_D5_GPIO_Port GPIOA
-#define m_D6_Pin LL_GPIO_PIN_6
-#define m_D6_GPIO_Port GPIOA
-#define m_D7_Pin LL_GPIO_PIN_7
-#define m_D7_GPIO_Port GPIOA
+/* ── Control input pins (CONTROL_PORT = GPIOI — TODO) ───────────────────────*/
+#define m_PHI2_Pin  LL_GPIO_PIN_0  /* PHI2 system clock       — TODO */
+#define m_S5_Pin    LL_GPIO_PIN_1  /* Atari S5 signal         — TODO */
+#define m_S4_Pin    LL_GPIO_PIN_2  /* Atari S4 signal         — TODO */
+#define m_D1XX_Pin  LL_GPIO_PIN_3  /* D1XX decode             — TODO */
+#define m_CCTL_Pin  LL_GPIO_PIN_4  /* CCTL (cartridge ctrl)   — TODO */
+#define m_RW_Pin    LL_GPIO_PIN_5  /* R/W line                — TODO */
+#define CONF0_Pin   LL_GPIO_PIN_6  /* DIP switch CONF0        — TODO */
+#define CONF1_Pin   LL_GPIO_PIN_7  /* DIP switch CONF1        — TODO */
+#define CONF2_Pin   LL_GPIO_PIN_8  /* DIP switch CONF2        — TODO */
 
-/* LED */
-#define LED_Pin LL_GPIO_PIN_0
-#define LED_GPIO_Port GPIOB
+/* ── Address bus pins (ADDR_PORT = GPIOC — TODO) ────────────────────────────*/
+#define m_A0_Pin    LL_GPIO_PIN_0
+#define m_A1_Pin    LL_GPIO_PIN_1
+#define m_A2_Pin    LL_GPIO_PIN_2
+#define m_A3_Pin    LL_GPIO_PIN_3
+#define m_A4_Pin    LL_GPIO_PIN_4
+#define m_A5_Pin    LL_GPIO_PIN_5
+#define m_A6_Pin    LL_GPIO_PIN_6
+#define m_A7_Pin    LL_GPIO_PIN_7
+#define m_A8_Pin    LL_GPIO_PIN_8
+#define m_A9_Pin    LL_GPIO_PIN_9
+#define m_A10_Pin   LL_GPIO_PIN_10
+#define m_A11_Pin   LL_GPIO_PIN_11
+#define m_A12_Pin   LL_GPIO_PIN_12
+#define m_A13_Pin   LL_GPIO_PIN_13
+#define m_A14_Pin   LL_GPIO_PIN_14
+#define m_A15_Pin   LL_GPIO_PIN_15
 
-/* CONTROL TO 6502 RESET,RD5,RD4,... */
-#define m_RST_Pin LL_GPIO_PIN_1
-#define m_RST_GPIO_Port GPIOB
-#define m_RD5_Pin LL_GPIO_PIN_2
-#define m_RD5_GPIO_Port GPIOB
-//#define m_REF_Pin LL_GPIO_PIN_3
-//#define m_REF_GPIO_Port GPIOB
-#define m_RD4_Pin LL_GPIO_PIN_4
-#define m_RD4_GPIO_Port GPIOB
-#define m_EXSEL_Pin LL_GPIO_PIN_5
-#define m_EXSEL_GPIO_Port GPIOB
-#define PB6_Pin LL_GPIO_PIN_6
-#define PB6_GPIO_Port GPIOB
-#define m_HALT_Pin LL_GPIO_PIN_7
-#define m_HALT_GPIO_Port GPIOB
-#define m_MPD_Pin LL_GPIO_PIN_8
-#define m_MPD_GPIO_Port GPIOB
-#define PB9_Pin LL_GPIO_PIN_9
-#define PB9_GPIO_Port GPIOB
-#define m_IRQ_Pin LL_GPIO_PIN_10
-#define m_IRQ_GPIO_Port GPIOB
+/* ── Data bus pins (DATA_PORT = GPIOA — TODO) ───────────────────────────────*/
+#define m_D0_Pin    LL_GPIO_PIN_0
+#define m_D1_Pin    LL_GPIO_PIN_1
+#define m_D2_Pin    LL_GPIO_PIN_2
+#define m_D3_Pin    LL_GPIO_PIN_3
+#define m_D4_Pin    LL_GPIO_PIN_4
+#define m_D5_Pin    LL_GPIO_PIN_5
+#define m_D6_Pin    LL_GPIO_PIN_6
+#define m_D7_Pin    LL_GPIO_PIN_7
 
-/* CONTROL FROM 6502 PHI2 CLK, R/W, ... */
-#define m_PHI2_Pin LL_GPIO_PIN_0
-#define m_PHI2_GPIO_Port GPIOI
-#define m_S5_Pin LL_GPIO_PIN_1
-#define m_S5_GPIO_Port GPIOI
-#define m_S4_Pin LL_GPIO_PIN_2
-#define m_S4_GPIO_Port GPIOI
-#define m_D1XX_Pin LL_GPIO_PIN_3
-#define m_D1XX_GPIO_Port GPIOI
-#define m_CCTL_Pin LL_GPIO_PIN_4
-#define m_CCTL_GPIO_Port GPIOI
-#define m_RW_Pin LL_GPIO_PIN_5
-#define m_RW_GPIO_Port GPIOI
+/* ── Output / control pins (OUTPUT_PORT = GPIOB — TODO) ─────────────────────*/
+#define LED_Pin      LL_GPIO_PIN_0   /* Green status LED       — TODO */
+#define m_RST_Pin    LL_GPIO_PIN_1   /* ATARI RESET (active L) — TODO */
+#define m_RD5_Pin    LL_GPIO_PIN_2   /* RD5 control            — TODO */
+#define m_IRQ_Pin    LL_GPIO_PIN_3   /* IRQ line               — TODO */
+#define m_RD4_Pin    LL_GPIO_PIN_4   /* RD4 control            — TODO */
+#define m_EXSEL_Pin  LL_GPIO_PIN_5   /* EXSEL (ext RAM enable) — TODO */
+#define m_HALT_Pin   LL_GPIO_PIN_6   /* HALT line              — TODO */
+#define m_MPD_Pin    LL_GPIO_PIN_7   /* MPD line               — TODO */
+#define PB6_Pin      LL_GPIO_PIN_8   /* General purpose        — TODO */
+#define PB9_Pin      LL_GPIO_PIN_9   /* General purpose        — TODO */
 
-/* DEBUG UART */
-#define DEBUG_TX_Pin LL_GPIO_PIN_9
-#define DEBUG_TX_GPIO_Port GPIOA
-#define DEBUG_RX_Pin LL_GPIO_PIN_10
-#define DEBUG_RX_GPIO_Port GPIOA
-
-/* EMULATION Configuration PIN */ 
-#define CONF0_Pin LL_GPIO_PIN_6
-#define CONF0_GPIO_Port GPIOI
-#define CONF1_Pin LL_GPIO_PIN_7
-#define CONF1_GPIO_Port GPIOI
-#define CONF2_Pin LL_GPIO_PIN_8
-#define CONF2_GPIO_Port GPIOI
+/* ── Error handler ───────────────────────────────────────────────────────────*/
+void Error_Handler(const char *msg);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
