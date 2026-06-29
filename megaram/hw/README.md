@@ -9,19 +9,32 @@ toolchain (Yosys + nextpnr).
 
 ## Theory of operation
 
+### Topology (Topology B — glue-logic only)
+
+The SRAM data bus is wired **directly** to the Atari data bus on the PCB via
+5V↔3.3V bidirectional level-shifters (e.g. TXS0108B).  The FPGA acts only
+as glue logic: it provides the bank-mapped SRAM address and the SRAM control
+signals (CE\_N, OE\_N, WE\_N).  This matches the topology used by real ATARI
+memory-expansion boards (RAMBO, Compyshop).
+
+### Bank-switching
+
 The ATARI XL/XE selects banked RAM by writing PORTB (`$D301`) after enabling
 the output-register mode via PBCTL (`$D303`, bit 2).  The banked window is
 `$4000–$7FFF` (16 KB).  The FPGA:
 
 1. Intercepts accesses to `$D301` / `$D303` to maintain shadow copies of
-   PORTB and PBCTL.
+   PORTB and PBCTL.  Drives the Atari data bus only for those register reads.
 2. Decodes the current bank number from PORTB according to the DIP-switch
    selected expansion type.
 3. When the CPU accesses `$4000–$7FFF` with external RAM enabled:
    - Asserts **EXTSEL\_N** (active-low) → disables the Atari's own SRAM.
    - Presents `{bank[5:0], addr[13:0]}` on the SRAM address bus.
    - Controls SRAM\_CE\_N / SRAM\_OE\_N / SRAM\_WE\_N for the access.
-   - For reads: drives the SRAM data onto the Atari data bus.
+   - For reads: the SRAM drives the Atari data bus directly (OE\_N low);
+     the FPGA tristates.
+   - For writes: the Atari CPU drives the shared data bus; the SRAM latches
+     it when WE\_N is asserted.
 
 ### Bus timing
 
@@ -33,7 +46,7 @@ PHI2 ───┘ HIGH ≈ 279 ns @ 1.79 MHz    └──────
          ├─ SRAM_ADDR / CE_N set      │
          ├─ SRAM data ready < 15 ns   │
          │                            ↓
-         write data latched on PHI2 falling edge (portb_emu registers)
+         PORTB/PBCTL latched on PHI2 falling edge (portb_emu registers)
 ```
 
 SRAM WE\_N is active for the whole PHI2 high period, giving the SRAM maximum
@@ -120,21 +133,21 @@ make ecp5           # → build/ecp5/top.bit
 |:-------|:----|:------------|
 | `phi2` | IN | PHI2 system clock (1.79 MHz) — **route to clock-capable pin** |
 | `addr[15:0]` | IN | Atari address bus A0–A15 |
-| `atari_data[7:0]` | BIDIR | Atari data bus D0–D7 |
+| `atari_data[7:0]` | BIDIR | Atari data bus D0–D7 (FPGA drives only for PIA reads) |
 | `rw` | IN | 1 = read, 0 = write |
 | `conf[2:0]` | IN | DIP switches: expansion type (CONF0=LSB) |
 | `extsel_n` | OUT | Active-low: disables Atari internal RAM in `$4000–$7FFF` |
 | `sram_addr[19:0]` | OUT | SRAM address bus (A0–A19; only A0–A18 used for 512 KB SRAM) |
-| `sram_data[7:0]` | BIDIR | SRAM data bus |
 | `sram_ce_n` | OUT | SRAM Chip Enable (active-low) |
 | `sram_oe_n` | OUT | SRAM Output Enable (active-low) |
 | `sram_we_n` | OUT | SRAM Write Enable (active-low) |
+| *(no sram\_data)* | — | SRAM data bus is wired directly to Atari bus on PCB |
 
 ### Level shifting
 
 All Atari bus signals are 5V TTL.  The FPGA operates at 3.3V.  Use a
-bidirectional level-shifter on the data bus (e.g. **SN74LVC8T245** or
-**TXS0108E**) and a unidirectional shifter on the address bus.
+bidirectional level-shifter on the data bus (e.g. **TXS0108B** or
+**TXS0108B**) and a unidirectional shifter on the address bus.
 
 ### SRAM
 

@@ -5,7 +5,7 @@
 # Verify with the board schematic and the iCE40 HX8K datasheet.
 #
 # All Atari bus signals operate at 5V; use 5V↔3.3V level-shifters
-# (e.g. TXS0108E or SN74LVC8T245) between the Atari and the FPGA IOs.
+# (e.g. TXS0108B) between the Atari and the FPGA IOs.
 #
 # Toolchain:
 #   yosys -p "synth_ice40 -top top -json top.json" \
@@ -58,6 +58,10 @@ set_io conf[2]     R1    # CONF2
 set_io extsel_n    R2    # EXTSEL_N (nEXSEL): disable Atari internal RAM
 
 # ── External SRAM (e.g. AS7C38096A-10TIN  512K×8, or 1M×8 for 1088K) ────
+# NOTE (Topology B): sram_data[7:0] is NOT a FPGA port.
+# The SRAM data bus is wired directly to the Atari data bus on the PCB
+# via bidirectional level-shifters (e.g. TXS0108B).
+#
 # Address bus
 set_io sram_addr[0]   T1   # TODO
 set_io sram_addr[1]   T2   # TODO
@@ -79,16 +83,6 @@ set_io sram_addr[16]  AE1  # TODO  (bank bit 2)
 set_io sram_addr[17]  AE2  # TODO  (bank bit 3)
 set_io sram_addr[18]  AF1  # TODO  (bank bit 4)
 set_io sram_addr[19]  AF2  # TODO  (bank bit 5 — only for 1M SRAM/1088K)
-
-# Data bus
-set_io sram_data[0]   B3   # TODO
-set_io sram_data[1]   C3   # TODO
-set_io sram_data[2]   D3   # TODO
-set_io sram_data[3]   E3   # TODO
-set_io sram_data[4]   F3   # TODO
-set_io sram_data[5]   G3   # TODO
-set_io sram_data[6]   H3   # TODO
-set_io sram_data[7]   J3   # TODO
 
 # Control
 set_io sram_ce_n   K3    # TODO

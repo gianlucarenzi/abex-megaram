@@ -1,6 +1,10 @@
 /* tb_top.v — Simulation testbench for the ATARI memory-expansion top module.
  *
- * Simulates a minimal subset of an ATARI XE bus:
+ * Topology B: SRAM data bus is wired directly to the Atari data bus.
+ * The testbench models this by having the SRAM model drive/receive from
+ * atari_data (the shared bus), not a separate sram_data wire.
+ *
+ * Tests:
  *   1. Write PBCTL ($D303) to enable output-register mode (bit 2 = 1).
  *   2. Write PORTB ($D301) to select bank 3 (130XE conf) → bank_r = 3.
  *   3. Read  from banked window ($5000) → check SRAM address & control.
@@ -24,20 +28,22 @@ module tb_top;
     reg  [2:0] conf;
     wire       extsel_n;
     wire [19:0] sram_addr;
-    wire [7:0]  sram_data;
     wire        sram_ce_n, sram_oe_n, sram_we_n;
 
     reg [7:0] atari_data_drive;
     reg       atari_data_en;
 
+    /* Atari CPU drives the bus during write cycles */
     assign atari_data = atari_data_en ? atari_data_drive : 8'hZZ;
 
-    /* Minimal SRAM model: 512K × 8 */
+    /* Minimal SRAM model: 512K × 8.
+     * Topology B: SRAM data is on the Atari data bus.
+     * Drive atari_data during reads; latch from atari_data on WE_N negedge. */
     reg [7:0] sram_mem [0:524287];
-    assign sram_data = (!sram_ce_n && !sram_oe_n && sram_we_n)
-                       ? sram_mem[sram_addr[18:0]] : 8'hZZ;
+    assign atari_data = (!sram_ce_n && !sram_oe_n && sram_we_n)
+                        ? sram_mem[sram_addr[18:0]] : 8'hZZ;
     always @(negedge sram_we_n)
-        if (!sram_ce_n) sram_mem[sram_addr[18:0]] <= sram_data;
+        if (!sram_ce_n) sram_mem[sram_addr[18:0]] <= atari_data;
 
     /* ── DUT instantiation ──────────────────────────────────────────────*/
     top #(.SRAM_ADDR_BITS(20)) dut (
@@ -48,7 +54,6 @@ module tb_top;
         .conf      (conf),
         .extsel_n  (extsel_n),
         .sram_addr (sram_addr),
-        .sram_data (sram_data),
         .sram_ce_n (sram_ce_n),
         .sram_oe_n (sram_oe_n),
         .sram_we_n (sram_we_n)
@@ -134,10 +139,12 @@ module tb_top;
             errors = errors + 1;
         end else $display("PASS T2b: bank=3");
 
-        /* ── TEST 3: Read from banked window → check SRAM address ───────*/
-        /* Expected SRAM addr = bank(3) << 14 | ($5000 & $3FFF) = $C000 | $1000 = $D000 */
-        bus_read(16'h5000, rd);
-        #10;
+        /* ── TEST 3: Read from banked window → check SRAM address/control ─
+         * Expected SRAM addr = bank(3)<<14 | ($5000 & $3FFF) = $C000|$1000 = $D000
+         * Control signals are sampled while PHI2 is still high. */
+        @(negedge phi2);
+        addr = 16'h5000; rw = 1; atari_data_en = 0;
+        @(posedge phi2); #50;          /* sample mid-cycle while PHI2 high */
         if (sram_ce_n !== 1'b0) begin
             $display("FAIL T3: SRAM_CE_N should be 0 during window read");
             errors = errors + 1;
@@ -151,6 +158,7 @@ module tb_top;
             errors = errors + 1;
         end else $display("PASS T3c: EXTSEL_N=0");
         $display("     SRAM_ADDR=0x%05X (expected 0x0D000)", sram_addr);
+        @(negedge phi2); #5; rw = 1;
 
         /* ── TEST 4: Write to banked window → check WE_N pulse ──────────*/
         bus_write(16'h5000, 8'h55);

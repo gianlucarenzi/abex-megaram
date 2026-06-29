@@ -5,7 +5,7 @@
 # Consult the ECP5-25k datasheet and your board schematic.
 #
 # All Atari bus signals operate at 5V; use 5V↔3.3V level-shifters
-# (e.g. TXS0108E or SN74LVC8T245) between the Atari and the FPGA IOs.
+# (e.g. TXS0108B) between the Atari and the FPGA IOs.
 #
 # Toolchain:
 #   yosys -p "synth_ecp5 -top top -json top.json" \
@@ -82,14 +82,9 @@ LOCATE COMP "sram_addr[17]" SITE "R3";  # TODO  (bank bit 3)
 LOCATE COMP "sram_addr[18]" SITE "T1";  # TODO  (bank bit 4)
 LOCATE COMP "sram_addr[19]" SITE "T2";  # TODO  (bank bit 5 — 1M SRAM only)
 
-LOCATE COMP "sram_data[0]"  SITE "U1";  # TODO
-LOCATE COMP "sram_data[1]"  SITE "U2";  # TODO
-LOCATE COMP "sram_data[2]"  SITE "U3";  # TODO
-LOCATE COMP "sram_data[3]"  SITE "V1";  # TODO
-LOCATE COMP "sram_data[4]"  SITE "V2";  # TODO
-LOCATE COMP "sram_data[5]"  SITE "V3";  # TODO
-LOCATE COMP "sram_data[6]"  SITE "W1";  # TODO
-LOCATE COMP "sram_data[7]"  SITE "W2";  # TODO
+# NOTE (Topology B): sram_data[7:0] is NOT a FPGA port.
+# The SRAM data bus is wired directly to the Atari data bus on the PCB
+# via bidirectional level-shifters (e.g. TXS0108B).
 
 LOCATE COMP "sram_ce_n"    SITE "W3";   # TODO
 LOCATE COMP "sram_oe_n"    SITE "Y1";   # TODO

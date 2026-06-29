@@ -1,8 +1,16 @@
 /* top.v — ATARI XL/XE memory-expansion glue logic for CPLD / FPGA.
  *
- * This module replaces the STM32F429 bank-switching firmware in
- * abex-megaram with a pure-hardware implementation suitable for any
- * Lattice iCE40 or ECP5 device (open-source toolchain: Yosys + nextpnr).
+ * ── Topology (Topology B — glue-logic only) ──────────────────────────────
+ *
+ * The SRAM data bus is wired DIRECTLY to the Atari data bus on the PCB via
+ * 5V↔3.3V bidirectional level-shifters (e.g. TXS0108B).  The FPGA acts
+ * only as glue logic: it provides the bank-mapped SRAM address and the SRAM
+ * control signals (CE_N, OE_N, WE_N), and also emulates the PIA registers
+ * ($D301/$D303) by driving the Atari data bus only for those reads.
+ *
+ * This matches the topology used by real ATARI memory-expansion boards
+ * (RAMBO, Compyshop) where the SRAM is on the Atari bus, not behind a
+ * separate FPGA-managed data path.
  *
  * ── Theory of operation ──────────────────────────────────────────────────
  *
@@ -14,11 +22,12 @@
  *   1. Asserts EXTSEL_N (active-low) to disable the Atari's internal RAM
  *      in $4000–$7FFF.
  *   2. Presents {bank, addr[13:0]} on the SRAM address bus.
- *   3. Controls SRAM_CE_N, SRAM_OE_N, SRAM_WE_N for the read or write.
- *   4. For reads: drives the decoded SRAM data onto the Atari data bus.
+ *   3. Controls SRAM_CE_N, SRAM_OE_N, SRAM_WE_N for the access.
+ *      The SRAM data bus drives the Atari data bus directly (reads) or
+ *      is driven by the Atari (writes) — the FPGA is not in the data path.
  *
  * Accesses to $D301/$D303 are intercepted to maintain the PORTB and PBCTL
- * shadow registers; all other cycles are ignored.
+ * shadow registers; the FPGA drives the Atari data bus only for those reads.
  *
  * ── Signal timing ─────────────────────────────────────────────────────────
  *
@@ -61,9 +70,10 @@ module top #(
     /* ── Atari control outputs ──────────────────────────────────────────*/
     output wire        extsel_n,        /* EXTSEL_N: disable internal RAM  */
 
-    /* ── External SRAM interface ────────────────────────────────────────*/
+    /* ── External SRAM — address and control only ───────────────────────
+     * The SRAM data bus is wired directly to the Atari data bus on the PCB
+     * via bidirectional level-shifters; no SRAM data pins on the FPGA.   */
     output wire [SRAM_ADDR_BITS-1:0] sram_addr,
-    inout  wire  [7:0] sram_data,
     output wire        sram_ce_n,
     output wire        sram_oe_n,
     output wire        sram_we_n
@@ -132,32 +142,11 @@ module top #(
      * the SRAM the maximum data-setup time. */
     assign sram_we_n = !sram_wr;
 
-    /* ── Write-data latch ───────────────────────────────────────────────
-     * Sample the Atari data bus on PHI2 rising edge.  The 6502 guarantees
-     * write data is valid before PHI2 rises, so this is safe.
-     *
-     * Using a DFF here (instead of a combinational pass-through) breaks the
-     * structural combinational loop that Yosys would otherwise detect:
-     *   atari_data → sram_data → atari_out → atari_data
-     * The registered path atari_data → write_latch → sram_data is not
-     * combinational and does not create a loop. */
-    reg [7:0] write_latch;
-    always @(posedge phi2)
-        write_latch <= atari_data;
-
-    /* ── Data-bus management ────────────────────────────────────────────*/
-
-    /* The FPGA drives the Atari data bus during:
-     *   - PIA register reads  (PORTB / PBCTL)
-     *   - External SRAM reads (data forwarded from sram_data) */
-    wire       atari_drv = pia_data_oe || sram_rd;
-    wire [7:0] atari_out = pia_data_oe ? pia_data_out : sram_data;
-
-    assign atari_data = atari_drv ? atari_out : 8'hZZ;
-
-    /* SRAM data bus: driven from the write_latch register during writes
-     * (not directly from atari_data, avoiding a combinational loop). */
-    assign sram_data = sram_wr ? write_latch : 8'hZZ;
+    /* ── Data-bus management ────────────────────────────────────────────
+     * The FPGA drives the Atari data bus ONLY for PIA register reads
+     * ($D301 / $D303).  For SRAM reads the SRAM chip drives the bus
+     * directly (SRAM_OE_N low); the FPGA must tristate. */
+    assign atari_data = pia_data_oe ? pia_data_out : 8'hZZ;
 
     /* ── EXTSEL_N ────────────────────────────────────────────────────────
      * Assert (low) to disable Atari's own $4000–$7FFF SRAM whenever we
