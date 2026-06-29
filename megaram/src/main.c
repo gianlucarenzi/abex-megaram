@@ -74,7 +74,7 @@ static uint32_t gpioa_moder_out;
 #define ATARI_RESET_ASSERT      GPIOB->BSRR = (GPIO_PIN_1 << 16); /* RST -> GPIO(B.1) LOW */
 #define ATARI_RESET_DEASSERT    GPIOB->BSRR = GPIO_PIN_1;   /* RST -> GPIO(B.1) HIGH */
 
-#define MEMORY_EXPANSION_TYPE   ((GPIOI->IDR & (0x7 << 6)) >> 6) /* PI9 PC7 PC6 */
+#define MEMORY_EXPANSION_TYPE   ((GPIOI->IDR & (0x7 << 6)) >> 6) /* PI6, PI7, PI8 = CONF0, CONF1, CONF2 */
 
 /* Default values?? TODO: Read Altirra's Manual... */
 static uint8_t PORTB = 0xFF;
@@ -386,15 +386,17 @@ static void init_bank_lut(t_expansion type)
 		switch (type)
 		{
 			case EXPANSION_TYPE_130XE:
-				b = ((p & 0x30) != 0x30) ? ((p & 0x0c) >> 2) : 0xFF;
+				/* CBE (bit 4) = 0: CPU accesses extended RAM; VBE (bit 5) is ANTIC-only */
+				b = !(p & 0x10) ? ((p & 0x0c) >> 2) : 0xFF;
 				break;
 			case EXPANSION_TYPE_192K:
-				b = ((p & 0x30) != 0x30) ?
+				b = !(p & 0x10) ?
 					(((p & 0x0c) + ((p & 0x40) >> 2)) >> 2) : 0xFF;
 				break;
 			case EXPANSION_TYPE_256K_RAMBO: {
+				/* RAME (bit 4) = 0: RAMBO active, all 16 banks; = 1: Atari internal RAM */
 				uint8_t bk = (((p & 0x0c) + ((p & 0x60) >> 1)) >> 2);
-				b = (p & 0x10) ? (bk & 0x3) : bk;
+				b = (p & 0x10) ? 0xFF : bk;
 				break;
 			}
 			case EXPANSION_TYPE_320K:
