@@ -132,6 +132,19 @@ module top #(
      * the SRAM the maximum data-setup time. */
     assign sram_we_n = !sram_wr;
 
+    /* ── Write-data latch ───────────────────────────────────────────────
+     * Sample the Atari data bus on PHI2 rising edge.  The 6502 guarantees
+     * write data is valid before PHI2 rises, so this is safe.
+     *
+     * Using a DFF here (instead of a combinational pass-through) breaks the
+     * structural combinational loop that Yosys would otherwise detect:
+     *   atari_data → sram_data → atari_out → atari_data
+     * The registered path atari_data → write_latch → sram_data is not
+     * combinational and does not create a loop. */
+    reg [7:0] write_latch;
+    always @(posedge phi2)
+        write_latch <= atari_data;
+
     /* ── Data-bus management ────────────────────────────────────────────*/
 
     /* The FPGA drives the Atari data bus during:
@@ -142,9 +155,9 @@ module top #(
 
     assign atari_data = atari_drv ? atari_out : 8'hZZ;
 
-    /* SRAM data bus: FPGA drives during writes (Atari → SRAM),
-     * tristated during reads (SRAM drives, FPGA only reads). */
-    assign sram_data = sram_wr ? atari_data : 8'hZZ;
+    /* SRAM data bus: driven from the write_latch register during writes
+     * (not directly from atari_data, avoiding a combinational loop). */
+    assign sram_data = sram_wr ? write_latch : 8'hZZ;
 
     /* ── EXTSEL_N ────────────────────────────────────────────────────────
      * Assert (low) to disable Atari's own $4000–$7FFF SRAM whenever we
