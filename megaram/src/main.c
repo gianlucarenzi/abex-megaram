@@ -359,6 +359,9 @@ static void banner(t_expansion type)
 		case EXPANSION_TYPE_576K_MOD:
 			printf(ANSI_BLUE "576K MOD EXPANSION\r\n" ANSI_RESET);
 			break;
+		case EXPANSION_TYPE_576K_COMPYSHOP:
+			printf(ANSI_BLUE "576K COMPYSHOP EXPANSION\r\n" ANSI_RESET);
+			break;
 		case EXPANSION_TYPE_1088K_MOD:
 			printf(ANSI_BLUE "1088K MOD EXPANSION\r\n" ANSI_RESET);
 			break;
