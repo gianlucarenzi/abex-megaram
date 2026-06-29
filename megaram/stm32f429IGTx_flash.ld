@@ -178,7 +178,7 @@ SECTIONS
 	* If initialized variables will be placed in this section,
 	* the startup code needs to be modified to copy the init-values.  
 	*/
-	.sram :
+	.sram (NOLOAD) :
 	{
 		. = ALIGN(4);
 		_ssram = .;       /* create a global symbol at sram start */
@@ -187,7 +187,7 @@ SECTIONS
 
 		. = ALIGN(4);
 		_esram = .;       /* create a global symbol at sram end */
-	} >SRAM AT> FLASH
+	} >SRAM
 
 	/* Uninitialized data section */
 	. = ALIGN(4);

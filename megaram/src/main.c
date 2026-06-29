@@ -59,17 +59,20 @@ typedef enum {
 #define RW      0x0020
 
 /* Only PA0-PA7 (D0-D7) change mode; PA8-PA15 (USART1 PA9/PA10) are preserved */
-#define SET_DATA_MODE_IN        GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000);
-#define SET_DATA_MODE_OUT       GPIOA->MODER = (GPIOA->MODER & 0xFFFF0000) | 0x00005555;
+static uint32_t gpioa_moder_in;
+static uint32_t gpioa_moder_out;
 
-#define GREEN_LED_OFF           LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_0);  /* HIGH ACTIVE */
-#define GREEN_LED_ON            LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_0);    /* HIGH ACTIVE */
+#define SET_DATA_MODE_IN        GPIOA->MODER = gpioa_moder_in;
+#define SET_DATA_MODE_OUT       GPIOA->MODER = gpioa_moder_out;
 
-#define INTERNAL_RAM_DISABLE    LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_5); /* nEXSEL LOW */
-#define INTERNAL_RAM_ENABLE     LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_5);   /* nEXSEL HIGH */
+#define GREEN_LED_OFF           GPIOB->BSRR = (GPIO_PIN_0 << 16);  /* HIGH ACTIVE */
+#define GREEN_LED_ON            GPIOB->BSRR = GPIO_PIN_0;    /* HIGH ACTIVE */
 
-#define ATARI_RESET_ASSERT      LL_GPIO_ResetOutputPin(GPIOB, GPIO_PIN_1); /* RST -> GPIO(B.1) LOW */
-#define ATARI_RESET_DEASSERT    LL_GPIO_SetOutputPin(GPIOB, GPIO_PIN_1);   /* RST -> GPIO(B.1) HIGH */
+#define INTERNAL_RAM_DISABLE    GPIOB->BSRR = (GPIO_PIN_5 << 16); /* nEXSEL LOW */
+#define INTERNAL_RAM_ENABLE     GPIOB->BSRR = GPIO_PIN_5;   /* nEXSEL HIGH */
+
+#define ATARI_RESET_ASSERT      GPIOB->BSRR = (GPIO_PIN_1 << 16); /* RST -> GPIO(B.1) LOW */
+#define ATARI_RESET_DEASSERT    GPIOB->BSRR = GPIO_PIN_1;   /* RST -> GPIO(B.1) HIGH */
 
 #define MEMORY_EXPANSION_TYPE   ((GPIOI->IDR & (0x7 << 6)) >> 6) /* PI9 PC7 PC6 */
 
@@ -96,9 +99,9 @@ static void usart_config(int baudrate);
   */
 void SystemClock_Config(void)
 {
-	LL_FLASH_SetLatency(LL_FLASH_LATENCY_5);
+	LL_FLASH_SetLatency(LL_FLASH_LATENCY_7);
 
-	if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_5)
+	if(LL_FLASH_GetLatency() != LL_FLASH_LATENCY_7)
 	{
 		Error_Handler("SystemClock_Config");  
 	}
@@ -111,7 +114,7 @@ void SystemClock_Config(void)
 	while(LL_RCC_HSE_IsReady() != 1)
 		;;
 
-	LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_4, 180, LL_RCC_PLLP_DIV_2);
+	LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_4, 216, LL_RCC_PLLP_DIV_2);
 	LL_RCC_PLL_Enable();
 
 	/* Wait till PLL is ready */
@@ -127,10 +130,10 @@ void SystemClock_Config(void)
 	while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL)
 		;;
 
-	/* We are running @ 180Mhz */
-	LL_Init1msTick(180000000);
+	/* We are running @ 216Mhz */
+	LL_Init1msTick(216000000);
 	LL_SYSTICK_SetClkSource(LL_SYSTICK_CLKSOURCE_HCLK);
-	LL_SetSystemCoreClock(180000000);
+	LL_SetSystemCoreClock(216000000);
 	LL_RCC_SetTIMPrescaler(LL_RCC_TIM_PRESCALER_TWICE);
 }
 
@@ -394,6 +397,10 @@ int main(void)
 	uint8_t c;
 	uint8_t watchdog = 0xff;
 
+	register GPIO_TypeDef *gpioi = GPIOI;
+	register GPIO_TypeDef *gpioc = GPIOC;
+	register GPIO_TypeDef *gpioa = GPIOA;
+
 	_write_ready(SYSCALL_NOTREADY); // printf is not functional here
  
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -420,6 +427,10 @@ int main(void)
 	// Reset EXTERNAL RAM
 	memset(expansion_ram, 0, RAMSIZ);
 
+	/* Initialize precalculated MODER values for fast PA0-PA7 switching */
+	gpioa_moder_in = (GPIOA->MODER & 0xFFFF0000);
+	gpioa_moder_out = gpioa_moder_in | 0x00005555;
+
 	// Start READING FROM DATABUS!
 	SET_DATA_MODE_IN
 
@@ -440,12 +451,13 @@ int main(void)
 		// Wait for a valid sequence in the bus
 
 		// wait for phi2 high
-		while (!((c = CONTROL_IN) & PHI2))
+		while (!(gpioi->IDR & PHI2))
 			;
+		c = gpioi->IDR;
 
 		// Check for address only if there is a valid state of the PHI2
 		// on the bus!
-		addr = ADDR_IN;
+		addr = gpioc->IDR;
 
 		switch (addr)
 		{
@@ -456,21 +468,20 @@ int main(void)
 				INTERNAL_RAM_DISABLE;
 				if (!(c & RW))
 				{
-					// Now READs the data to be written
-					data = DATA_IN;
 					// read the data bus on falling edge of phi2
-					while (CONTROL_IN & PHI2)
-						data = DATA_IN;
+					while (gpioi->IDR & PHI2)
+						;
+					data = gpioa->IDR;
 					PBCTL = data;
 				}
 				else
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
-					DATA_OUT = PBCTL;
+					gpioa->ODR = PBCTL;
 
 					// wait for phi2 low
-					while (CONTROL_IN & PHI2)
+					while (gpioi->IDR & PHI2)
 						;
 					SET_DATA_MODE_IN
 				}
@@ -496,11 +507,10 @@ int main(void)
 				INTERNAL_RAM_DISABLE;
 				if (!(c & RW))
 				{
-					// Now READs the data to be written
-					data = DATA_IN;
 					// read the data bus on falling edge of phi2
-					while (CONTROL_IN & PHI2)
-						data = DATA_IN;
+					while (gpioi->IDR & PHI2)
+						;
+					data = gpioa->IDR;
 					/*
 					 * Save internally the PORTB data only if it is intended
 					 * as memory banked selection register and not if
@@ -513,10 +523,10 @@ int main(void)
 				{
 					// ATARI CPU Needs to READ Data
 					SET_DATA_MODE_OUT
-					DATA_OUT = PORTB;
+					gpioa->ODR = PORTB;
 
 					// wait for phi2 low
-					while (CONTROL_IN & PHI2)
+					while (gpioi->IDR & PHI2)
 						;
 					SET_DATA_MODE_IN
 				}
@@ -547,11 +557,10 @@ int main(void)
 					{
 						// Now we can write the data at the desired address
 						// stored in the external ram expansion
-						// Now READs the data to be written
-						data = DATA_IN;
 						// read the data bus on falling edge of phi2
-						while (CONTROL_IN & PHI2)
-							data = DATA_IN;
+						while (gpioi->IDR & PHI2)
+							;
+						data = gpioa->IDR;
 						EMULATION_TYPE = data;
 						GREEN_LED_ON;
 						ATARI_RESET_ASSERT;
@@ -729,20 +738,19 @@ int main(void)
 							{
 								// Now we can write the data at the desired address
 								// stored in the external ram expansion
-								// Now READs the data to be written
-								data = DATA_IN;
 								// read the data bus on falling edge of phi2
-								while (CONTROL_IN & PHI2)
-									data = DATA_IN;
+								while (gpioi->IDR & PHI2)
+									;
+								data = gpioa->IDR;
 								expansion_ram[internal_address] = data;
 							}
 							else
 							{
 								// CPU Needs to READ Data from external memory
 								SET_DATA_MODE_OUT
-								DATA_OUT = expansion_ram[internal_address];
+								gpioa->ODR = expansion_ram[internal_address];
 								// wait for phi2 low
-								while (CONTROL_IN & PHI2)
+								while (gpioi->IDR & PHI2)
 									;
 								SET_DATA_MODE_IN
 							}
