@@ -202,13 +202,16 @@ static void fmc_sram_init(void)
 	hsram1.Init.WriteBurst = FMC_WRITE_BURST_DISABLE;
 	hsram1.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
 	hsram1.Init.PageSize = FMC_PAGE_SIZE_NONE;
-	/* Timing */
-	Timing.AddressSetupTime = 15;
-	Timing.AddressHoldTime = 15;
-	Timing.DataSetupTime = 255;
-	Timing.BusTurnAroundDuration = 15;
-	Timing.CLKDivision = 16;
-	Timing.DataLatency = 17;
+	/* Timing for AS7C38096A-10TIN (tAA=10ns, tRC=10ns) @ 180MHz (HCLK=5.55ns/cycle)
+	 * ADDSET=1 -> 2 cycles = 11.1ns (tASU satisfied)
+	 * DATAST=2 -> 3 cycles = 16.7ns > tAA=10ns
+	 * BUSTURN=1 -> 2 cycles turnaround between accesses */
+	Timing.AddressSetupTime = 1;
+	Timing.AddressHoldTime = 1;
+	Timing.DataSetupTime = 2;
+	Timing.BusTurnAroundDuration = 1;
+	Timing.CLKDivision = 2;
+	Timing.DataLatency = 2;
 	Timing.AccessMode = FMC_ACCESS_MODE_A;
 	/* ExtTiming */
 
